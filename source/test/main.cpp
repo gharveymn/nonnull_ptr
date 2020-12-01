@@ -1,5 +1,3 @@
-#include <nonnull_ptr.hpp>
-
 #include <iostream>
 #include <cassert>
 #include <unordered_map>
@@ -7,6 +5,8 @@
 #include <random>
 #include <algorithm>
 #include <numeric>
+
+#include <nonnull_ptr.hpp>
 
 using namespace gch;
 
@@ -55,12 +55,7 @@ static_assert (std::is_trivially_copyable<nonnull_ptr<int>>::value, "");
 static_assert (std::is_trivially_destructible<nonnull_ptr<int>>::value, "");
 
 static constexpr int g_x = 0;
-
-#if __cpp_lib_addressof_constexpr
 static constexpr nonnull_ptr<const int> g_rx { g_x };
-#else
-static const optional_ref<const int> g_rx { g_x };
-#endif
 
 void print_test_header (const std::string& str)
 {
@@ -470,7 +465,7 @@ void test_perf_equality (void)
     auto mean = std::accumulate (times.begin (), times.end (), 0.0) / num_tests;
     
     auto variance = std::accumulate (times.begin (), times.end (), 0.0,
-                                     [&mean, &num_tests] (auto accum, const auto& val)
+                                     [&mean, num_tests] (double accum, const double& val)
                                      {
                                        return accum +
                                          (std::pow (val - mean, 2.0) / (num_tests - 1));
@@ -486,7 +481,7 @@ void test_perf_equality (void)
     auto mean = std::accumulate (times.begin (), times.end (), 0.0) / num_tests;
   
     auto variance = std::accumulate (times.begin (), times.end (), 0.0,
-                                     [&mean, &num_tests] (auto accum, const auto& val)
+                                     [&mean, num_tests] (double accum, const double& val)
                                      {
                                        return accum +
                                          (std::pow (val - mean, 2.0) / (num_tests - 1));

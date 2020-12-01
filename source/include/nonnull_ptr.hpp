@@ -83,6 +83,19 @@ namespace gch
     template <typename T> struct is_nonnull_ptr                 : std::false_type { };
     template <typename T> struct is_nonnull_ptr<nonnull_ptr<T>> : std::true_type  { };
     
+    template <typename ...>
+    using void_t = void;
+  
+    template <typename T, typename Enable = void>
+    struct has_constexpr_ampersand
+      : std::false_type
+    { };
+  
+    template <typename T>
+    struct has_constexpr_ampersand<T, void_t<decltype (&std::declval<T&> ())>>
+      : std::true_type
+    { };
+    
   public:
     
     //! For the record, I don't think the explicit conversions are even possible
@@ -108,8 +121,8 @@ namespace gch
     template <typename U,
               typename = typename std::enable_if<constructible_from<U>::value>::type,
               typename std::enable_if<convertible_from<U>::value, bool>::type = true>
-    GCH_CONSTEXPR_ADDRESSOF /* implicit */ nonnull_ptr (U& ref) noexcept
-      : m_ptr (std::addressof (ref))
+    constexpr /* implicit */ nonnull_ptr (U& ref) noexcept
+      : m_ptr (&ref)
     { }
   
     /**
@@ -124,8 +137,8 @@ namespace gch
     template <typename U,
               typename = typename std::enable_if<constructible_from<U>::value>::type,
               typename std::enable_if<! convertible_from<U>::value, bool>::type = false>
-    GCH_CONSTEXPR_ADDRESSOF explicit nonnull_ptr (U& ref) noexcept
-      : m_ptr (std::addressof (static_cast<reference> (ref)))
+    constexpr explicit nonnull_ptr (U& ref) noexcept
+      : m_ptr (&static_cast<reference> (ref))
     { }
   
     /**
@@ -240,9 +253,9 @@ namespace gch
      */
     template <typename U,
               typename = typename std::enable_if<constructible_from<U>::value>::type>
-    GCH_CONSTEXPR_ADDRESSOF reference emplace (U& ref) noexcept
+    GCH_CPP14_CONSTEXPR reference emplace (U& ref) noexcept
     {
-      return *(m_ptr = static_cast<pointer> (std::addressof (ref)));
+      return *(m_ptr = &static_cast<reference> (ref));
     }
   
     /**
@@ -804,7 +817,7 @@ namespace gch
 
 /**
  * A specialization of `std::hash` for `gch::nonnull_ptr`.
- * 
+ *
  * @tparam T the value type of `gch::nonnull_ptr`.
  */
 template <typename T>
@@ -812,9 +825,9 @@ struct std::hash<gch::nonnull_ptr<T>>
 {
   /**
    * An invokable operator.
-   * 
+   *
    * We just do a noop pointer hash (which is unique).
-   * 
+   *
    * @param nn a reference to a value of type `gch::nonnull_ptr`.
    * @return a hash of the argument.
    */
