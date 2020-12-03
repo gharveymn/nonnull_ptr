@@ -69,7 +69,8 @@
 #endif
 
 namespace gch
-{  
+{
+  
   /**
    * A pointer wrapper which is not nullable.
    * 

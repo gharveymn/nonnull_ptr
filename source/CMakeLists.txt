@@ -5,6 +5,7 @@ IF(NOT HAS_CREATE_PACKAGE)
 ENDIF()
 
 CREATE_PACKAGE(AUTHOR        gharveymn
+               NAMESPACE     gch
                NAME          nonnull_ptr
                HEADERS       nonnull_ptr.hpp
                COMPATIBILITY AnyNewerVersion)
