@@ -15,38 +15,58 @@
 #include <typeindex>
 #include <utility>
 
-#if __has_cpp_attribute(nodiscard) >= 201603L
-#  define GCH_NODISCARD [[nodiscard]]
-#else
-#  define GCH_NODISCARD
+#ifndef GCH_CPP14_CONSTEXPR
+#  if __cpp_constexpr >= 201304L
+#    define GCH_CPP14_CONSTEXPR constexpr
+#  else
+#    define GCH_CPP14_CONSTEXPR
+#  endif
 #endif
 
-#if __cpp_lib_addressof_constexpr >= 201603L
-#  define GCH_CONSTEXPR_ADDRESSOF constexpr
-#else
-#  define GCH_CONSTEXPR_ADDRESSOF
+#ifndef GCH_CPP17_CONSTEXPR
+#  if __cpp_constexpr >= 201603L
+#    define GCH_CPP17_CONSTEXPR constexpr
+#  else
+#    define GCH_CPP17_CONSTEXPR
+#  endif
 #endif
 
-#if __cpp_inline_variables >= 201606
-#  define GCH_INLINE_VARS inline
-#else
-#  define GCH_INLINE_VARS
+#ifndef GCH_CPP20_CONSTEXPR
+#  if __cpp_constexpr >= 201907L
+#    define GCH_CPP20_CONSTEXPR constexpr
+#  else
+#    define GCH_CPP20_CONSTEXPR
+#  endif
 #endif
 
-#if __cpp_lib_constexpr_algorithms >= 201806L
-#  define GCH_CONSTEXPR_SWAP constexpr
-#else
-#  define GCH_CONSTEXPR_SWAP
+#ifndef GCH_NODISCARD
+#  if __has_cpp_attribute(nodiscard) >= 201603L
+#    define GCH_NODISCARD [[nodiscard]]
+#  else
+#    define GCH_NODISCARD
+#  endif
 #endif
 
-#if __cpp_constexpr >= 201304L
-#  define GCH_CPP14_CONSTEXPR constexpr
-#else 
-#  define GCH_CPP14_CONSTEXPR
+#ifndef GCH_INLINE_VARS
+#  if __cpp_inline_variables >= 201606
+#    define GCH_INLINE_VARS inline
+#  else
+#    define GCH_INLINE_VARS
+#  endif
 #endif
 
-#if __cpp_deduction_guides >= 201703
-#  define GCH_DEDUCTION_GUIDE_SUPPORT
+#ifndef GCH_CONSTEXPR_SWAP
+#  if __cpp_lib_constexpr_algorithms >= 201806L
+#    define GCH_CONSTEXPR_SWAP constexpr
+#  else
+#    define GCH_CONSTEXPR_SWAP
+#  endif
+#endif
+
+#ifndef GCH_CTAD_SUPPORT
+#  if __cpp_deduction_guides >= 201703
+#    define GCH_CTAD_SUPPORT
+#  endif
 #endif
 
 namespace gch
@@ -785,13 +805,13 @@ namespace gch
    */
   template <typename U>
   GCH_NODISCARD
-  GCH_CONSTEXPR_ADDRESSOF nonnull_ptr<typename std::remove_reference<U>::type> 
+  constexpr nonnull_ptr<typename std::remove_reference<U>::type>
   make_nonnull_ptr (U&& ref) noexcept
   {
-    return nonnull_ptr<typename std::remove_reference<U>::type> {std::forward<U> (ref) };
+    return nonnull_ptr<typename std::remove_reference<U>::type> { std::forward<U> (ref) };
   }
 
-#ifdef GCH_DEDUCTION_GUIDE_SUPPORT
+#ifdef GCH_CTAD_SUPPORT
   template <typename U>
   nonnull_ptr (U&&) -> nonnull_ptr<std::remove_reference_t<U>>;
 #endif
@@ -835,12 +855,5 @@ struct std::hash<gch::nonnull_ptr<T>>
     return reinterpret_cast<std::size_t> (nn.get ());
   }
 };
-
-#undef GCH_NODISCARD
-#undef GCH_CONSTEXPR_ADDRESSOF
-#undef GCH_INLINE_VARS
-#undef GCH_CONSTEXPR_SWAP
-#undef GCH_CPP14_CONSTEXPR
-#undef GCH_DEDUCTION_GUIDE_SUPPORT
 
 #endif

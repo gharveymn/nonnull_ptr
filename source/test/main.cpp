@@ -1,3 +1,5 @@
+#include "nonnull_ptr.hpp"
+
 #include <iostream>
 #include <cassert>
 #include <unordered_map>
@@ -5,8 +7,6 @@
 #include <random>
 #include <algorithm>
 #include <numeric>
-
-#include <nonnull_ptr.hpp>
 
 using namespace gch;
 
