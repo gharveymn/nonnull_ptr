@@ -11,7 +11,6 @@
 #define NONNULL_PTR_HPP
 
 #include <iosfwd>
-#include <memory>
 #include <type_traits>
 #include <typeindex>
 #include <utility>
@@ -278,7 +277,7 @@ namespace gch
   };
   
   /**
-   * An equality comparison function
+   * An equality comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U the value type of `r`.
@@ -294,7 +293,7 @@ namespace gch
   }
   
   /**
-   * An inequality comparison function
+   * An inequality comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U the value type of `r`.
@@ -310,7 +309,7 @@ namespace gch
   }
   
   /**
-   * An less-than comparison function
+   * A less-than comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U the value type of `r`.
@@ -326,7 +325,7 @@ namespace gch
   }
   
   /**
-   * An greater-than comparison function
+   * A greater-than comparison function
    *
    * @tparam T the value type of `l`.
    * @tparam U the value type of `r`.
@@ -342,7 +341,7 @@ namespace gch
   }
   
   /**
-   * An less-than-equal comparison function
+   * A less-than-equal comparison function
    *
    * @tparam T the value type of `l`.
    * @tparam U the value type of `r`.
@@ -358,7 +357,7 @@ namespace gch
   }
   
   /**
-   * An greater-than-equal comparison function
+   * A greater-than-equal comparison function
    *
    * @tparam T the value type of `l`.
    * @tparam U the value type of `r`.
@@ -374,7 +373,7 @@ namespace gch
   }
   
   /**
-   * An equality comparison function
+   * An equality comparison function.
    *
    * @tparam T the value type of `l`.
    * @param l a `nonnull_ptr`.
@@ -390,7 +389,7 @@ namespace gch
   }
   
   /**
-   * An equality comparison function
+   * An equality comparison function.
    *
    * @tparam T the value type of `r`.
    * @param l a `std::nullptr_t`.
@@ -406,7 +405,7 @@ namespace gch
   }
   
   /**
-   * An inequality comparison function
+   * An inequality comparison function.
    *
    * @tparam T the value type of `l`.
    * @param l a `nonnull_ptr`.
@@ -422,7 +421,7 @@ namespace gch
   }
   
   /**
-   * An inequality comparison function
+   * An inequality comparison function.
    *
    * @tparam T the value type of `r`.
    * @param l a `std::nullptr_t`.
@@ -438,7 +437,7 @@ namespace gch
   }
   
   /**
-   * An less-than comparison function
+   * A less-than comparison function.
    *
    * @tparam T the value type of `l`.
    * @param l a `nonnull_ptr`.
@@ -454,7 +453,7 @@ namespace gch
   }
   
   /**
-   * An less-than comparison function
+   * A less-than comparison function.
    *
    * @tparam T the value type of `r`.
    * @param l a `std::nullptr_t`.
@@ -470,7 +469,7 @@ namespace gch
   }
   
   /**
-   * An greater-than comparison function
+   * A greater-than comparison function.
    *
    * @tparam T the value type of `l`.
    * @param l a `nonnull_ptr`.
@@ -486,7 +485,7 @@ namespace gch
   }
   
   /**
-   * An greater-than comparison function
+   * A greater-than comparison function.
    *
    * @tparam T the value type of `r`.
    * @param l a `std::nullptr_t`.
@@ -502,7 +501,7 @@ namespace gch
   }
   
   /**
-   * An less-than-equal comparison function
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `l`.
    * @param l a `nonnull_ptr`.
@@ -518,7 +517,7 @@ namespace gch
   }
   
   /**
-   * An less-than-equal comparison function
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `r`.
    * @param l a `std::nullptr_t`.
@@ -534,7 +533,7 @@ namespace gch
   }
   
   /**
-   * An greater-than-equal comparison function
+   * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `l`.
    * @param l a `nonnull_ptr`.
@@ -550,7 +549,7 @@ namespace gch
   }
   
   /**
-   * An greater-than-equal comparison function
+   * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `r`.
    * @param l a `std::nullptr_t`.
@@ -566,7 +565,7 @@ namespace gch
   }
   
   /**
-   * An equality comparison function
+   * An equality comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U a value type which is comparable to T*.
@@ -582,7 +581,7 @@ namespace gch
   }
   
   /**
-   * An equality comparison function
+   * An equality comparison function.
    *
    * @tparam T the value type of `r`.
    * @tparam U a value type which is comparable to T*.
@@ -598,7 +597,7 @@ namespace gch
   }
   
   /**
-   * An inequality comparison function
+   * An inequality comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U a value type which is comparable to T*.
@@ -614,7 +613,7 @@ namespace gch
   }
   
   /**
-   * An inequality comparison function
+   * An inequality comparison function.
    *
    * @tparam T the value type of `r`.
    * @tparam U a value type which is comparable to T*.
@@ -630,7 +629,7 @@ namespace gch
   }
   
   /**
-   * An less-than comparison function
+   * A less-than comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U a value type which is comparable to T*.
@@ -646,7 +645,7 @@ namespace gch
   }
   
   /**
-   * An less-than comparison function
+   * A less-than comparison function.
    *
    * @tparam T the value type of `r`.
    * @tparam U a value type which is comparable to T*.
@@ -662,7 +661,7 @@ namespace gch
   }
   
   /**
-   * An greater-than comparison function
+   * A greater-than comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U a value type which is comparable to T*.
@@ -678,7 +677,7 @@ namespace gch
   }
   
   /**
-   * An greater-than comparison function
+   * A greater-than comparison function.
    *
    * @tparam T the value type of `r`.
    * @tparam U a value type which is comparable to T*.
@@ -694,7 +693,7 @@ namespace gch
   }
   
   /**
-   * An less-than-equal comparison function
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U a value type which is comparable to T*.
@@ -710,7 +709,7 @@ namespace gch
   }
   
   /**
-   * An less-than-equal comparison function
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `r`.
    * @tparam U a value type which is comparable to T*.
@@ -726,7 +725,7 @@ namespace gch
   }
   
   /**
-   * An greater-than-equal comparison function
+   * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `l`.
    * @tparam U a value type which is comparable to T*.
@@ -742,7 +741,7 @@ namespace gch
   }
   
   /**
-   * An greater-than-equal comparison function
+   * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `r`.
    * @tparam U a value type which is comparable to T*.
