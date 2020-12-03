@@ -3,17 +3,17 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ADD_EXECUTABLE(test_nonnull_ptr main.cpp)
 TARGET_LINK_LIBRARIES(test_nonnull_ptr nonnull_ptr)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+IF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   TARGET_COMPILE_OPTIONS(test_nonnull_ptr PUBLIC -stdlib=libc++ -ftime-trace --coverage -Wall -Wextra)
-  TARGET_LINK_OPTIONS(test_nonnull_ptr PUBLIC -Wl --allow-multiple-definition --coverage)
+  TARGET_LINK_OPTIONS(test_nonnull_ptr PUBLIC "-Wl,--allow-multiple-definition" --coverage)
   TARGET_LINK_LIBRARIES(test_nonnull_ptr c++ c++abi)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   TARGET_COMPILE_OPTIONS(test_nonnull_ptr PUBLIC -Wall -Wextra)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   TARGET_COMPILE_OPTIONS(test_nonnull_ptr PUBLIC /W4)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 
-endif ()
+ENDIF()
 
 SET_TARGET_PROPERTIES(test_nonnull_ptr PROPERTIES
                       CXX_STANDARD          11
