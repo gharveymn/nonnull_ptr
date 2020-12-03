@@ -4,7 +4,7 @@ ADD_EXECUTABLE(test_nonnull_ptr main.cpp)
 TARGET_LINK_LIBRARIES(test_nonnull_ptr nonnull_ptr)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  TARGET_COMPILE_OPTIONS(test_nonnull_ptr PUBLIC -stdlib=libc++ -ftime-trace --coverage -Wall -Wextra)
+  TARGET_COMPILE_OPTIONS(test_nonnull_ptr PUBLIC -stdlib=libc++ -ftime-trace --coverage -Wall)
   TARGET_LINK_OPTIONS(test_nonnull_ptr PUBLIC -Wl --allow-multiple-definition --coverage)
   TARGET_LINK_LIBRARIES(test_nonnull_ptr c++ c++abi)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

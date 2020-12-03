@@ -7,8 +7,8 @@
  * of the MIT license. See the LICENSE file for details.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef NONNULL_PTR_HPP
-#define NONNULL_PTR_HPP
+#ifndef GCH_NONNULL_PTR_HPP
+#define GCH_NONNULL_PTR_HPP
 
 #include <type_traits>
 #include <functional>

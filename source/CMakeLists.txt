@@ -7,7 +7,7 @@ ENDIF()
 CREATE_PACKAGE(AUTHOR        gharveymn
                NAME          nonnull_ptr
                HEADERS       nonnull_ptr.hpp
-               COMPATIBILITY ExactVersion)
+               COMPATIBILITY AnyNewerVersion)
 
 # Only include tests if we are at the top level
 IF(NONNULL_PTR_BUILD_TESTS)
