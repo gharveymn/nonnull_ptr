@@ -11,7 +11,7 @@
 #define NONNULL_PTR_HPP
 
 #include <type_traits>
-#include <typeindex>
+#include <functional>
 #include <utility>
 
 #ifndef GCH_CPP14_CONSTEXPR
@@ -804,26 +804,31 @@ namespace gch
 
 }
 
-/**
- * A specialization of `std::hash` for `gch::nonnull_ptr`.
- *
- * @tparam T the value type of `gch::nonnull_ptr`.
- */
-template <typename T>
-struct std::hash<gch::nonnull_ptr<T>>
+namespace std
 {
+  
   /**
-   * An invokable operator.
+   * A specialization of `std::hash` for `gch::nonnull_ptr`.
    *
-   * We just do a noop pointer hash (which is unique).
-   *
-   * @param nn a reference to a value of type `gch::nonnull_ptr`.
-   * @return a hash of the argument.
+   * @tparam T the value type of `gch::nonnull_ptr`.
    */
-  constexpr std::size_t operator() (const gch::nonnull_ptr<T>& nn) const noexcept
+  template <typename T>
+  struct hash<gch::nonnull_ptr<T>>
   {
-    return reinterpret_cast<std::size_t> (nn.get ());
-  }
-};
+    /**
+     * An invokable operator.
+     *
+     * We just do a noop pointer hash (which is unique).
+     *
+     * @param nn a reference to a value of type `gch::nonnull_ptr`.
+     * @return a hash of the argument.
+     */
+    std::size_t operator() (const gch::nonnull_ptr<T>& nn) const noexcept
+    {
+      return reinterpret_cast<std::size_t> (nn.get ());
+    }
+  };
+  
+}
 
 #endif
