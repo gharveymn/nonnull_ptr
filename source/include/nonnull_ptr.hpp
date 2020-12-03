@@ -1,7 +1,7 @@
 /** nonnull_ptr.hpp
  * Defines an non-null pointer.
  *
- * Copyright © 2019 Gene Harvey
+ * Copyright © 2020 Gene Harvey
  *
  * This software may be modified and distributed under the terms
  * of the MIT license. See the LICENSE file for details.
@@ -10,7 +10,6 @@
 #ifndef NONNULL_PTR_HPP
 #define NONNULL_PTR_HPP
 
-#include <iosfwd>
 #include <type_traits>
 #include <typeindex>
 #include <utility>
@@ -101,19 +100,6 @@ namespace gch
     
     template <typename T> struct is_nonnull_ptr                 : std::false_type { };
     template <typename T> struct is_nonnull_ptr<nonnull_ptr<T>> : std::true_type  { };
-    
-    template <typename ...>
-    using void_t = void;
-  
-    template <typename T, typename Enable = void>
-    struct has_constexpr_ampersand
-      : std::false_type
-    { };
-  
-    template <typename T>
-    struct has_constexpr_ampersand<T, void_t<decltype (&std::declval<T&> ())>>
-      : std::true_type
-    { };
     
   public:
     
@@ -815,23 +801,7 @@ namespace gch
   template <typename U>
   nonnull_ptr (U&&) -> nonnull_ptr<std::remove_reference_t<U>>;
 #endif
-  
-  
-  /**
-   * Prints the given `nonnull_ptr`.
-   *
-   * We defer to the `T*` overload of `operator<<`.
-   *
-   * @tparam T the element type of the `nonnull_ptr`.
-   * @param o a `std::ostream`.
-   * @param nn a `nonnull_ptr`.
-   * @return a reference to the modified `std::ostream`.
-   */
-  template <typename T>
-  std::ostream& operator<< (std::ostream& o, const nonnull_ptr<T>& nn)
-  {
-    return o << nn.get ();
-  }
+
 }
 
 /**
