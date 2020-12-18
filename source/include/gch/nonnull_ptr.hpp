@@ -201,6 +201,16 @@ namespace gch
     {
       return m_ptr;
     }
+  
+    /**
+     * An explicit conversion operator to `reference`.
+     *
+     * @return the dereferenced pointer
+     */
+    constexpr explicit operator reference (void) const noexcept
+    {
+      return *m_ptr;
+    }
     
     /**
      * Returns a pointer.
