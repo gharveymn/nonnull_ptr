@@ -46,11 +46,11 @@
 #  endif
 #endif
 
-#ifndef GCH_INLINE_VARS
+#ifndef GCH_INLINE_VAR
 #  if __cpp_inline_variables >= 201606
-#    define GCH_INLINE_VARS inline
+#    define GCH_INLINE_VAR inline
 #  else
-#    define GCH_INLINE_VARS
+#    define GCH_INLINE_VAR
 #  endif
 #endif
 
@@ -70,57 +70,57 @@
 
 namespace gch
 {
-  
+
   /**
    * A pointer wrapper which is not nullable.
-   * 
+   *
    * @tparam Value the value type of the stored pointer.
    */
   template <typename Value>
   class nonnull_ptr
   {
   public:
-    
-    static_assert(! std::is_reference<Value>::value, 
+
+    static_assert(! std::is_reference<Value>::value,
       "nonnull_ptr expects a value type as a template argument, not a reference.");
-    
+
     using element_type    = Value;        /*!< The value type of the stored pointer */
     using value_type      = Value;        /*!< An alias for `element_type`          */
     using reference       = Value&;       /*!< The reference type to be wrapped     */
     using pointer         = Value*;       /*!< The pointer type to the value type   */
     using const_reference = const Value&; /*!< A constant reference to `Value`      */
     using const_pointer   = const Value*; /*!< A constant pointer to `Value`        */
-    
+
   private:
-    
+
     template <typename U>
     using constructible_from = std::is_constructible<pointer, U*>;
-  
+
     template <typename U>
     using convertible_from = std::is_convertible<U*, pointer>;
-    
+
     template <typename T> struct is_nonnull_ptr                 : std::false_type { };
     template <typename T> struct is_nonnull_ptr<nonnull_ptr<T>> : std::true_type  { };
-    
+
   public:
-    
+
     //! For the record, I don't think the explicit conversions are even possible
-    //! since we are only using raw pointers, but I can't find a definitive 
+    //! since we are only using raw pointers, but I can't find a definitive
     //! reference to that fact, so they stay.
-    
+
     nonnull_ptr (void)                              = delete;
     nonnull_ptr (const nonnull_ptr&)                = default;
     nonnull_ptr (nonnull_ptr&&) noexcept            = default;
     nonnull_ptr& operator= (const nonnull_ptr&)     = default;
     nonnull_ptr& operator= (nonnull_ptr&&) noexcept = default;
     ~nonnull_ptr (void)                             = default;
-  
+
     /**
      * Constructor
-     * 
+     *
      * A constructor for the case where `U*` is
      * implicitly convertible to type `pointer`.
-     * 
+     *
      * @tparam U a referenced value type.
      * @param ref a reference whose pointer is implicitly convertible to type `pointer`.
      */
@@ -130,13 +130,13 @@ namespace gch
     constexpr /* implicit */ nonnull_ptr (U& ref) noexcept
       : m_ptr (&ref)
     { }
-  
+
     /**
      * Constructor
-     * 
-     * A constructor for the case where `pointer` is 
+     *
+     * A constructor for the case where `pointer` is
      * explicitly constructable from `U*`.
-     * 
+     *
      * @tparam U a referenced value type.
      * @param ref a argument from which `pointer` may be explicitly constructed.
      */
@@ -146,24 +146,24 @@ namespace gch
     constexpr explicit nonnull_ptr (U& ref) noexcept
       : m_ptr (&static_cast<reference> (ref))
     { }
-  
+
     /**
      * Constructor
-     * 
+     *
      * A deleted contructor for the case where `ref` is an rvalue reference.
      */
     template <typename U,
               typename = typename std::enable_if<! is_nonnull_ptr<U>::value>::type>
     nonnull_ptr (const U&&) = delete;
-  
+
     /**
      * Constructor
-     * 
-     * A copy constructor from another nonnull_ptr for the case 
+     *
+     * A copy constructor from another nonnull_ptr for the case
      * where `U*` is implicitly convertible to type `pointer`.
-     * 
+     *
      * @tparam U a referenced value type.
-     * @param other an nonnull_ptr whose pointer is implicitly 
+     * @param other an nonnull_ptr whose pointer is implicitly
      *              convertible to type `pointer`.
      */
     template <typename U,
@@ -172,15 +172,15 @@ namespace gch
     constexpr /* implicit */ nonnull_ptr (const nonnull_ptr<U>& other) noexcept
       : m_ptr (other.get ())
     { }
-  
+
     /**
      * Constructor
-     * 
-     * A copy constructor from another nonnull_ptr for the case 
+     *
+     * A copy constructor from another nonnull_ptr for the case
      * where `pointer` is explicitly constructable from `U*`.
-     * 
+     *
      * @tparam U a referenced value type.
-     * @param ref an nonnull_ptr which contains a pointer from 
+     * @param ref an nonnull_ptr which contains a pointer from
      *            which `pointer` may be explicitly constructed.
      */
     template <typename U,
@@ -189,7 +189,7 @@ namespace gch
     constexpr explicit nonnull_ptr (const nonnull_ptr<U>& other) noexcept
       : m_ptr (static_cast<pointer> (other.get ()))
     { }
-    
+
     /**
      * A conversion operator to `pointer`.
      *
@@ -201,7 +201,7 @@ namespace gch
     {
       return m_ptr;
     }
-  
+
     /**
      * An explicit conversion operator to `reference`.
      *
@@ -211,58 +211,58 @@ namespace gch
     {
       return *m_ptr;
     }
-    
+
     /**
      * Returns a pointer.
-     * 
+     *
      * @return the stored pointer
      */
     GCH_NODISCARD
-    constexpr pointer get (void) const noexcept 
+    constexpr pointer get (void) const noexcept
     {
       return m_ptr;
     }
-    
+
     /**
      * Returns a reference.
-     * 
+     *
      * @return the dereferenced pointer.
      */
-    GCH_NODISCARD 
-    constexpr reference operator* (void) const noexcept 
+    GCH_NODISCARD
+    constexpr reference operator* (void) const noexcept
     {
       return *m_ptr;
     }
-    
+
     /**
      * Returns a pointer to the value.
-     * 
+     *
      * Never fails. The return is the same as from `get`.
-     * 
+     *
      * @return a pointer to the value.
      */
-    GCH_NODISCARD 
-    constexpr pointer operator-> (void) const noexcept 
-    { 
-      return m_ptr; 
+    GCH_NODISCARD
+    constexpr pointer operator-> (void) const noexcept
+    {
+      return m_ptr;
     }
-  
+
     /**
      * Swap the contained pointer with that of `other`.
-     * 
+     *
      * @param other a reference to another `nonnull_ptr`.
      */
-    GCH_CONSTEXPR_SWAP void swap (nonnull_ptr& other) noexcept 
+    GCH_CONSTEXPR_SWAP void swap (nonnull_ptr& other) noexcept
     {
       using std::swap;
       swap (this->m_ptr, other.m_ptr);
     }
-    
+
     /**
      * Sets the contained pointer.
-     * 
+     *
      * Internally, sets the a pointer to the address of the referenced value.
-     * 
+     *
      * @tparam U a reference type convertible to `reference`.
      * @param ref an lvalue reference.
      * @return the argument `ref`.
@@ -273,26 +273,26 @@ namespace gch
     {
       return *(m_ptr = &static_cast<reference> (ref));
     }
-  
+
     /**
      * A deleted version for convertible rvalue references.
-     * 
-     * We don't want to allow rvalue references because the internal pointer 
+     *
+     * We don't want to allow rvalue references because the internal pointer
      * does not sustain the object lifetime.
      */
     template <typename U,
               typename = typename std::enable_if<constructible_from<U>::value>::type>
     reference emplace (const U&&) = delete;
-    
+
   private:
-    
+
     /**
      * A pointer to the value.
      */
     pointer m_ptr;
-    
+
   };
-  
+
   /**
    * An equality comparison function.
    *
@@ -308,7 +308,7 @@ namespace gch
   {
     return l.get () == r.get ();
   }
-  
+
   /**
    * An inequality comparison function.
    *
@@ -324,7 +324,7 @@ namespace gch
   {
     return l.get () != r.get ();
   }
-  
+
   /**
    * A less-than comparison function.
    *
@@ -340,7 +340,7 @@ namespace gch
   {
     return l.get () < r.get ();
   }
-  
+
   /**
    * A greater-than comparison function
    *
@@ -356,7 +356,7 @@ namespace gch
   {
     return l.get () > r.get ();
   }
-  
+
   /**
    * A less-than-equal comparison function
    *
@@ -372,7 +372,7 @@ namespace gch
   {
     return l.get () <= r.get ();
   }
-  
+
   /**
    * A greater-than-equal comparison function
    *
@@ -388,7 +388,7 @@ namespace gch
   {
     return l.get () >= r.get ();
   }
-  
+
   /**
    * An equality comparison function.
    *
@@ -396,7 +396,7 @@ namespace gch
    * @param l a `nonnull_ptr`.
    * @param r a `std::nullptr_t`.
    * @return the result of the equality comparison.
-   * 
+   *
    * @see std::optional::operator==
    */
   template <typename T> GCH_NODISCARD
@@ -404,7 +404,7 @@ namespace gch
   {
     return false;
   }
-  
+
   /**
    * An equality comparison function.
    *
@@ -412,7 +412,7 @@ namespace gch
    * @param l a `std::nullptr_t`.
    * @param r a `nonnull_ptr`.
    * @return the result of the equality comparison.
-   * 
+   *
    * @see std::optional::operator==
    */
   template <typename T> GCH_NODISCARD
@@ -420,7 +420,7 @@ namespace gch
   {
     return false;
   }
-  
+
   /**
    * An inequality comparison function.
    *
@@ -428,7 +428,7 @@ namespace gch
    * @param l a `nonnull_ptr`.
    * @param r a `std::nullptr_t`.
    * @return the result of the inequality comparison.
-   * 
+   *
    * @see std::optional::operator!=
    */
   template <typename T> GCH_NODISCARD
@@ -436,7 +436,7 @@ namespace gch
   {
     return true;
   }
-  
+
   /**
    * An inequality comparison function.
    *
@@ -444,7 +444,7 @@ namespace gch
    * @param l a `std::nullptr_t`.
    * @param r a `nonnull_ptr`.
    * @return the result of the inequality comparison.
-   * 
+   *
    * @see std::optional::operator!=
    */
   template <typename T> GCH_NODISCARD
@@ -452,7 +452,7 @@ namespace gch
   {
     return true;
   }
-  
+
   /**
    * A less-than comparison function.
    *
@@ -460,7 +460,7 @@ namespace gch
    * @param l a `nonnull_ptr`.
    * @param r a `std::nullptr_t`.
    * @return the result of the less-than comparison.
-   * 
+   *
    * @see std::optional::operator<
    */
   template <typename T> GCH_NODISCARD
@@ -468,7 +468,7 @@ namespace gch
   {
     return false;
   }
-  
+
   /**
    * A less-than comparison function.
    *
@@ -476,7 +476,7 @@ namespace gch
    * @param l a `std::nullptr_t`.
    * @param r a `nonnull_ptr`.
    * @return the result of the less-than comparison.
-   * 
+   *
    * @see std::optional::operator<
    */
   template <typename T> GCH_NODISCARD
@@ -484,7 +484,7 @@ namespace gch
   {
     return true;
   }
-  
+
   /**
    * A greater-than comparison function.
    *
@@ -492,7 +492,7 @@ namespace gch
    * @param l a `nonnull_ptr`.
    * @param r a `std::nullptr_t`.
    * @return the result of the greater-than comparison.
-   * 
+   *
    * @see std::optional::operator>
    */
   template <typename T> GCH_NODISCARD
@@ -500,7 +500,7 @@ namespace gch
   {
     return true;
   }
-  
+
   /**
    * A greater-than comparison function.
    *
@@ -508,7 +508,7 @@ namespace gch
    * @param l a `std::nullptr_t`.
    * @param r a `nonnull_ptr`.
    * @return the result of the greater-than comparison.
-   * 
+   *
    * @see std::optional::operator>
    */
   template <typename T> GCH_NODISCARD
@@ -516,7 +516,7 @@ namespace gch
   {
     return false;
   }
-  
+
   /**
    * A less-than-equal comparison function.
    *
@@ -524,7 +524,7 @@ namespace gch
    * @param l a `nonnull_ptr`.
    * @param r a `std::nullptr_t`.
    * @return the result of the less-than-equal comparison.
-   * 
+   *
    * @see std::optional::operator<=
    */
   template <typename T> GCH_NODISCARD
@@ -532,7 +532,7 @@ namespace gch
   {
     return false;
   }
-  
+
   /**
    * A less-than-equal comparison function.
    *
@@ -540,7 +540,7 @@ namespace gch
    * @param l a `std::nullptr_t`.
    * @param r a `nonnull_ptr`.
    * @return the result of the less-than-equal comparison.
-   * 
+   *
    * @see std::optional::operator<=
    */
   template <typename T> GCH_NODISCARD
@@ -548,7 +548,7 @@ namespace gch
   {
     return true;
   }
-  
+
   /**
    * A greater-than-equal comparison function.
    *
@@ -556,7 +556,7 @@ namespace gch
    * @param l a `nonnull_ptr`.
    * @param r a `std::nullptr_t`.
    * @return the result of the greater-than-equal comparison.
-   * 
+   *
    * @see std::optional::operator>=
    */
   template <typename T> GCH_NODISCARD
@@ -564,7 +564,7 @@ namespace gch
   {
     return true;
   }
-  
+
   /**
    * A greater-than-equal comparison function.
    *
@@ -572,7 +572,7 @@ namespace gch
    * @param l a `std::nullptr_t`.
    * @param r a `nonnull_ptr`.
    * @return the result of the greater-than-equal comparison.
-   * 
+   *
    * @see std::optional::operator>=
    */
   template <typename T> GCH_NODISCARD
@@ -580,7 +580,7 @@ namespace gch
   {
     return false;
   }
-  
+
   /**
    * An equality comparison function.
    *
@@ -596,7 +596,7 @@ namespace gch
   {
     return l.get () == r;
   }
-  
+
   /**
    * An equality comparison function.
    *
@@ -612,7 +612,7 @@ namespace gch
   {
     return l == r.get ();
   }
-  
+
   /**
    * An inequality comparison function.
    *
@@ -628,7 +628,7 @@ namespace gch
   {
     return l.get () != r;
   }
-  
+
   /**
    * An inequality comparison function.
    *
@@ -644,7 +644,7 @@ namespace gch
   {
     return l != r.get ();
   }
-  
+
   /**
    * A less-than comparison function.
    *
@@ -660,7 +660,7 @@ namespace gch
   {
     return l.get () < r;
   }
-  
+
   /**
    * A less-than comparison function.
    *
@@ -676,7 +676,7 @@ namespace gch
   {
     return l < r.get ();
   }
-  
+
   /**
    * A greater-than comparison function.
    *
@@ -692,7 +692,7 @@ namespace gch
   {
     return l.get () > r;
   }
-  
+
   /**
    * A greater-than comparison function.
    *
@@ -708,7 +708,7 @@ namespace gch
   {
     return l > r.get ();
   }
-  
+
   /**
    * A less-than-equal comparison function.
    *
@@ -724,7 +724,7 @@ namespace gch
   {
     return l.get () <= r;
   }
-  
+
   /**
    * A less-than-equal comparison function.
    *
@@ -740,7 +740,7 @@ namespace gch
   {
     return l <= r.get ();
   }
-  
+
   /**
    * A greater-than-equal comparison function.
    *
@@ -756,7 +756,7 @@ namespace gch
   {
     return l.get () >= r;
   }
-  
+
   /**
    * A greater-than-equal comparison function.
    *
@@ -772,32 +772,32 @@ namespace gch
   {
     return l >= r.get ();
   }
-  
+
   /**
    * A swap function.
-   * 
+   *
    * Swaps the two `nonnull_ptr`s of the same type.
-   * 
+   *
    * @tparam T the value type pointed to by the `nonnull_ptr`s
    * @param l a `nonnull_ptr`.
    * @param r a `nonnull_ptr`.
    */
   template <typename T>
-  GCH_CONSTEXPR_SWAP inline void 
+  GCH_CONSTEXPR_SWAP inline void
   swap (nonnull_ptr<T>& l, nonnull_ptr<T>& r) noexcept
   {
     l.swap (r);
   }
-  
+
   /**
    * An nonnull_ptr creation function.
-   * 
+   *
    * Creates a `nonnull_ptr` with the specified argument.
-   * 
+   *
    * @tparam U a forwarded type.
    * @param ref a forwarded value.
    * @return a `nonnull_ptr` created from the argument.
-   * 
+   *
    * @see std::make_optional
    */
   template <typename U>
@@ -817,7 +817,7 @@ namespace gch
 
 namespace std
 {
-  
+
   /**
    * A specialization of `std::hash` for `gch::nonnull_ptr`.
    *
@@ -839,7 +839,7 @@ namespace std
       return reinterpret_cast<std::size_t> (nn.get ());
     }
   };
-  
+
 }
 
 #endif
