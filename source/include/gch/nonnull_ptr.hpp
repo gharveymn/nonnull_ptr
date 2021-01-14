@@ -192,7 +192,7 @@ namespace gch
                                   &&! pointer_to_is_convertible<U>::value>::type * = nullptr>
     constexpr explicit
     nonnull_ptr (U& ref) noexcept
-      : m_ptr (static_cast<reference> (&ref))
+      : m_ptr (static_cast<pointer> (&ref))
     { }
 
     /**
