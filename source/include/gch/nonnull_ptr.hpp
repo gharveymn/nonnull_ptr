@@ -1030,6 +1030,14 @@ namespace gch
   nonnull_ptr (U&&) -> nonnull_ptr<std::remove_reference_t<U>>;
 #endif
 
+  /**
+   * A convenience alias for const pointers.
+   *
+   * @tparam T an unqualified value type.
+   */
+  template <typename T>
+  using nonnull_cptr = nonnull_ptr<const T>;
+
 }
 
 namespace std
