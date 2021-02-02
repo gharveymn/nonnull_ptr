@@ -373,9 +373,9 @@ void test_comparison (void)
   print_test_footer ();
 }
 
-void test_make_optional_ref (void)
+void test_make_nonnull_ptr (void)
 {
-  print_test_header ("test make_optional_ref");
+  print_test_header ("test make_nonnull_ptr");
 
   int x = 1;
   const int y = 2;
@@ -496,7 +496,7 @@ void test_perf_equality (void)
 
     auto stddev = std::sqrt (variance);
 
-    std::cout << "  nonnull mean: " << mean << std::endl;
+    std::cout << "nonnull mean:   " << mean << std::endl;
     std::cout << "nonnull stddev: " << stddev << std::endl;
   }
   {
@@ -512,10 +512,36 @@ void test_perf_equality (void)
 
     auto stddev = std::sqrt (variance);
 
-    std::cout << "  double* mean: " << mean << std::endl;
+    std::cout << "double* mean:   " << mean << std::endl;
     std::cout << "double* stddev: " << stddev << std::endl;
   }
 }
+
+#ifdef GCH_HAS_CPP14_CONSTEXPR
+
+constexpr
+bool
+test_constexpr_swap (void)
+{
+  int x = 1;
+  int y = 2;
+  nonnull_ptr<int> rx { x };
+  nonnull_ptr<int> ry { y };
+  nonnull_ptr<int> rz { x };
+
+  bool t1 = (rx != ry) && (rx == rz);
+
+  using std::swap;
+  swap (ry, rz);
+
+  bool t2 = (rx == ry) && (rx != rz);
+
+  return t1 && t2;
+}
+
+static_assert (test_constexpr_swap (), "failed swap");
+
+#endif
 
 int main (void)
 {
@@ -526,7 +552,7 @@ int main (void)
   test_inheritence ();
   test_movement ();
   test_comparison ();
-  test_make_optional_ref ();
+  test_make_nonnull_ptr ();
   test_hash ();
   test_deduction ();
   // test_perf_equality ();

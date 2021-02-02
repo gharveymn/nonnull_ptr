@@ -1,7 +1,7 @@
 /** nonnull_ptr.hpp
- * Defines an non-null pointer.
+ * Defines an pointer wrapper which is not nullable.
  *
- * Copyright © 2020 Gene Harvey
+ * Copyright © 2020-2021 Gene Harvey
  *
  * This software may be modified and distributed under the terms
  * of the MIT license. See the LICENSE file for details.
@@ -13,6 +13,14 @@
 #include <type_traits>
 #include <functional>
 #include <utility>
+
+#ifdef __clang__
+#  if defined (__cplusplus) && __cplusplus >= 201703L
+#    ifndef GCH_CLANG_17
+#      define GCH_CLANG_17
+#    endif
+#  endif
+#endif
 
 #ifdef __cpp_constexpr
 #  ifndef GCH_CPP14_CONSTEXPR
@@ -47,6 +55,14 @@
 #  endif
 #endif
 
+#ifndef GCH_CPP20_CONSTEVAL
+#  if defined (__cpp_consteval) && __cpp_consteval >= 201811L
+#    define GCH_CPP20_CONSTEVAL consteval
+#  else
+#    define GCH_CPP20_CONSTEVAL constexpr
+#  endif
+#endif
+
 #ifndef GCH_NODISCARD
 #  if defined (__has_cpp_attribute) && __has_cpp_attribute (nodiscard) >= 201603L
 #    if ! defined (__clang__) || defined (GCH_CLANG_17)
@@ -56,22 +72,6 @@
 #    endif
 #  else
 #    define GCH_NODISCARD
-#  endif
-#endif
-
-#ifndef GCH_INLINE_VAR
-#  if defined (__cpp_inline_variables) && __cpp_inline_variables >= 201606
-#    define GCH_INLINE_VAR inline
-#  else
-#    define GCH_INLINE_VAR
-#  endif
-#endif
-
-#ifndef GCH_SWAP_CONSTEXPR
-#  if defined (__cpp_lib_constexpr_algorithms) && __cpp_lib_constexpr_algorithms >= 201806L
-#    define GCH_SWAP_CONSTEXPR constexpr
-#  else
-#    define GCH_SWAP_CONSTEXPR
 #  endif
 #endif
 
@@ -192,7 +192,7 @@ namespace gch
                                   &&! pointer_to_is_convertible<U>::value>::type * = nullptr>
     constexpr explicit
     nonnull_ptr (U& ref) noexcept
-      : m_ptr (static_cast<pointer> (&ref))
+      : m_ptr (&ref)
     { }
 
     /**
@@ -237,7 +237,7 @@ namespace gch
                                   &&! std::is_convertible<U *, pointer>::value>::type * = nullptr>
     constexpr explicit
     nonnull_ptr (const nonnull_ptr<U>& other) noexcept
-      : m_ptr (static_cast<pointer> (other.get ()))
+      : m_ptr (other.get ())
     { }
 
     /**
@@ -256,6 +256,9 @@ namespace gch
     /**
      * An explicit conversion to `reference`.
      *
+     * This is provided because the class basically
+     * acts as a rebindable reference wrapper.
+     *
      * @return the dereferenced pointer
      */
     GCH_NODISCARD constexpr explicit
@@ -265,7 +268,7 @@ namespace gch
     }
 
     /**
-     * Returns a pointer.
+     * Returns the pointer.
      *
      * @return the stored pointer
      */
@@ -277,7 +280,7 @@ namespace gch
     }
 
     /**
-     * Returns a reference.
+     * Returns the dereferenced pointer.
      *
      * @return the dereferenced pointer.
      */
@@ -307,12 +310,14 @@ namespace gch
      *
      * @param other a reference to another `nonnull_ptr`.
      */
-    GCH_SWAP_CONSTEXPR
+    GCH_CPP14_CONSTEXPR
     void
     swap (nonnull_ptr& other) noexcept
     {
-      using std::swap;
-      swap (this->m_ptr, other.m_ptr);
+      // manually done so we can lower the version requirements for constexpr
+      pointer tmp = m_ptr;
+      m_ptr       = other.m_ptr;
+      other.m_ptr = tmp;
     }
 
     /**
@@ -330,7 +335,7 @@ namespace gch
     reference
     emplace (U& ref) noexcept
     {
-      return *(m_ptr = static_cast<pointer> (&ref));
+      return *(m_ptr = pointer (&ref));
     }
 
     /**
@@ -361,7 +366,7 @@ namespace gch
     reference
     emplace (const nonnull_ptr<U>& other) noexcept
     {
-      return *(m_ptr = static_cast<pointer> (other.get ()));
+      return *(m_ptr = pointer (other.get ()));
     }
 
     /**
@@ -532,7 +537,7 @@ namespace gch
    * @return the result of the equality comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator== (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
@@ -568,7 +573,7 @@ namespace gch
    * @return the result of the equality comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator== (std::nullptr_t, const nonnull_ptr<T>&) noexcept
   {
@@ -584,7 +589,7 @@ namespace gch
    * @return the result of the inequality comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator!= (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
@@ -600,7 +605,7 @@ namespace gch
    * @return the result of the inequality comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator!= (std::nullptr_t, const nonnull_ptr<T>&) noexcept
   {
@@ -616,7 +621,7 @@ namespace gch
    * @return the result of the less-than comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator< (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
@@ -632,7 +637,7 @@ namespace gch
    * @return the result of the less-than comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator< (std::nullptr_t, const nonnull_ptr<T>&) noexcept
   {
@@ -648,7 +653,7 @@ namespace gch
    * @return the result of the greater-than comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator> (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
@@ -664,7 +669,7 @@ namespace gch
    * @return the result of the greater-than comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator> (std::nullptr_t, const nonnull_ptr<T>&) noexcept
   {
@@ -680,7 +685,7 @@ namespace gch
    * @return the result of the less-than-equal comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator<= (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
@@ -696,7 +701,7 @@ namespace gch
    * @return the result of the less-than-equal comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator<= (std::nullptr_t, const nonnull_ptr<T>&) noexcept
   {
@@ -712,7 +717,7 @@ namespace gch
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator>= (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
@@ -728,7 +733,7 @@ namespace gch
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
   operator>= (std::nullptr_t, const nonnull_ptr<T>&) noexcept
   {
@@ -1000,7 +1005,8 @@ namespace gch
    * @param r a `nonnull_ptr`.
    */
   template <typename T>
-  GCH_SWAP_CONSTEXPR inline void
+  inline GCH_CPP14_CONSTEXPR
+  void
   swap (nonnull_ptr<T>& l, nonnull_ptr<T>& r) noexcept
   {
     l.swap (r);
@@ -1011,23 +1017,31 @@ namespace gch
    *
    * Creates a `nonnull_ptr` with the specified argument.
    *
-   * @tparam U a forwarded type.
-   * @param ref a forwarded value.
+   * @tparam U a value type.
+   * @param ref a reference.
    * @return a `nonnull_ptr` created from the argument.
-   *
-   * @see std::make_optional
    */
   template <typename U>
-  GCH_NODISCARD
-  constexpr nonnull_ptr<typename std::remove_reference<U>::type>
-  make_nonnull_ptr (U&& ref) noexcept
+  GCH_NODISCARD constexpr
+  nonnull_ptr<U>
+  make_nonnull_ptr (U& ref) noexcept
   {
-    return nonnull_ptr<typename std::remove_reference<U>::type> { std::forward<U> (ref) };
+    return nonnull_ptr<U> { ref };
   }
 
-#ifdef GCH_CTAD_SUPPORT
+  /**
+   * A deleted version for the case where `ref` is an rvalue reference.
+   */
   template <typename U>
-  nonnull_ptr (U&&) -> nonnull_ptr<std::remove_reference_t<U>>;
+  GCH_NODISCARD constexpr
+  nonnull_ptr<U>
+  make_nonnull_ptr (const U&& ref) = delete;
+
+#ifdef GCH_CTAD_SUPPORT
+
+  template <typename U>
+  nonnull_ptr (U&) -> nonnull_ptr<U>;
+
 #endif
 
   /**
@@ -1054,14 +1068,15 @@ namespace std
     /**
      * An invokable operator.
      *
-     * We just do a noop pointer hash (which is unique).
+     * We just forward to std::hash on the underlying pointer.
      *
      * @param nn a reference to a value of type `gch::nonnull_ptr`.
      * @return a hash of the argument.
      */
-    std::size_t operator() (const gch::nonnull_ptr<T>& nn) const noexcept
+    std::size_t
+    operator() (const gch::nonnull_ptr<T>& ptr) const noexcept
     {
-      return reinterpret_cast<std::size_t> (nn.get ());
+      return std::hash<typename gch::nonnull_ptr<T>::pointer> { } (ptr.get ());
     }
   };
 
