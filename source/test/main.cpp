@@ -99,18 +99,18 @@ void test_const (void)
   const int z = 1;
 
   nonnull_ptr<int> rx { x };
-  nonnull_ptr<const int> rz = z;
+  nonnull_ptr<const int> rz = std::pointer_traits<nonnull_ptr<const int>>::pointer_to (z);
 
   assert (*rx == *rz);
   assert (rx != rz);
 
   // set rz with a non-const reference
-  rz = y;
+  rz.emplace (y);
 
   assert (*rx != *rz);
   assert (rx != rz);
 
-  rz = x;
+  rz.emplace (x);
 
   assert (*rx == *rz);
   assert (rx == rz);
@@ -175,7 +175,7 @@ void test_inheritence (void)
   my_struct s0 { };
   my_struct s1 { };
   s1.x = 1;
-  const nonnull_ptr<my_struct_base> r0 = s0;
+  const nonnull_ptr<my_struct_base> r0 { s0 };
   const nonnull_ptr<my_struct> r1 (s1);
 
   assert (*r0 != *r1);
@@ -283,7 +283,7 @@ void test_comparison (void)
   assert (  (ry >= rx));
 
   // disparate type comparisons (equal)
-  ry = a[0];
+  ry = make_nonnull_ptr (a[0]);
   assert (  (rx == ry));
   assert (  (ry == rx));
   assert (! (rx != ry));
@@ -401,9 +401,9 @@ void test_hash (void)
   map.emplace (y, &ys);
   map.emplace (z, &zs);
 
-  assert (&xs == map[x]);
-  assert (&ys == map[y]);
-  assert (&zs == map[z]);
+  assert (&xs == map[nonnull_ptr<int> { x }]);
+  assert (&ys == map[make_nonnull_ptr (y)]);
+  assert (&zs == map[make_nonnull_ptr (z)]);
 
   print_test_footer ();
 }
@@ -470,8 +470,8 @@ double test_perf_equality_worker (void)
 
   for (auto i = 0; i < num; ++i)
   {
-    nonnull_ptr<double> l = v[dist (gen)];
-    nonnull_ptr<double> r = v[dist (gen)];
+    nonnull_ptr<double> l (v[dist (gen)]);
+    nonnull_ptr<double> r = make_nonnull_ptr (v[dist (gen)]);
     static_cast<void> (l == r);
   }
 

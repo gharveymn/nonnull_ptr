@@ -419,14 +419,14 @@ namespace gch
      *
      * This is for use with std::pointer_traits.
      *
-     * @param r a reference of type `element_type&`.
-     * @return a nonnull_ptr containing a pointer to `r`.
+     * @param ref a reference of type `element_type&`.
+     * @return a nonnull_ptr containing a pointer to `ref`.
      */
     static constexpr
     nonnull_ptr
-    pointer_to (element_type& r) noexcept
+    pointer_to (element_type& ref) noexcept
     {
-      return nonnull_ptr { r };
+      return nonnull_ptr { ref };
     }
 
   private:
@@ -439,35 +439,37 @@ namespace gch
   /**
    * An equality comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @tparam U the value type of `r`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `lhs`.
+   * @tparam U the value type of `rhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the equality comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator== (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
+  operator== (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (lhs.get () == rhs.get ()))
   {
-    return l.get () == r.get ();
+    return lhs.get () == rhs.get ();
   }
 
   /**
    * An inequality comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @tparam U the value type of `r`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `lhs`.
+   * @tparam U the value type of `rhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the inequality comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator!= (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
+  operator!= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (lhs.get () != rhs.get ()))
   {
-    return l.get () != r.get ();
+    return lhs.get () != rhs.get ();
   }
 
   /**
@@ -483,6 +485,9 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator< (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (std::less<typename std::common_type<
+      typename nonnull_ptr<T>::pointer,
+      typename nonnull_ptr<U>::pointer>::type> { } (lhs.get (), rhs.get ())))
   {
     using common_ty = typename std::common_type<typename nonnull_ptr<T>::pointer,
                                                 typename nonnull_ptr<U>::pointer>::type;
@@ -502,6 +507,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator<= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (! (rhs < lhs)))
   {
     return ! (rhs < lhs);
   }
@@ -519,6 +525,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator> (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (lhs < rhs))
   {
     return rhs < lhs;
   }
@@ -536,6 +543,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator>= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (! (lhs < rhs)))
   {
     return ! (lhs < rhs);
   }
@@ -556,6 +564,7 @@ namespace gch
   std::compare_three_way_result_t<typename nonnull_ptr<T>::pointer,
                                   typename nonnull_ptr<U>::pointer>
   operator<=> (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (std::compare_three_way { } (lhs.get (), rhs.get ())))
     requires std::three_way_comparable_with<typename nonnull_ptr<T>::pointer,
                                             typename nonnull_ptr<U>::pointer>
   {
@@ -591,7 +600,7 @@ namespace gch
    * @return the result of the three-way comparison.
    */
   template <typename T>
-  GCH_NODISCARD constexpr
+  GCH_NODISCARD GCH_CPP20_CONSTEVAL
   std::strong_ordering
   operator<=> (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
@@ -791,6 +800,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator== (const nonnull_ptr<T>& lhs, U *rhs)
+    noexcept (noexcept (lhs.get () == rhs))
   {
     return lhs.get () == rhs;
   }
@@ -808,6 +818,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator== (U *lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (lhs == rhs.get ()))
   {
     return lhs == rhs.get ();
   }
@@ -825,6 +836,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator!= (const nonnull_ptr<T>& lhs, U *rhs)
+    noexcept (noexcept (lhs.get () != rhs))
   {
     return lhs.get () != rhs;
   }
@@ -842,6 +854,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator!= (U *lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (lhs != rhs.get ()))
   {
     return lhs != rhs.get ();
   }
@@ -859,6 +872,8 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator< (const nonnull_ptr<T>& lhs, U *rhs)
+    noexcept (noexcept (std::less<typename std::common_type<
+      typename nonnull_ptr<T>::pointer, U *>::type> { } (lhs.get (), rhs)))
   {
     using common_ty = typename std::common_type<typename nonnull_ptr<T>::pointer, U *>::type;
     return std::less<common_ty> { } (lhs.get (), rhs);
@@ -877,6 +892,8 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator< (U *lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (std::less<typename std::common_type<
+      typename nonnull_ptr<T>::pointer, U *>::type> { } (lhs, rhs.get ())))
   {
     using common_ty = typename std::common_type<U *, typename nonnull_ptr<T>::pointer>::type;
     return std::less<common_ty> { } (lhs, rhs.get ());
@@ -895,6 +912,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator<= (const nonnull_ptr<T>& lhs, U *rhs)
+    noexcept (noexcept (! (rhs < lhs)))
   {
     return ! (rhs < lhs);
   }
@@ -912,6 +930,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator<= (U *lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (! (rhs < lhs)))
   {
     return ! (rhs < lhs);
   }
@@ -929,6 +948,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator> (const nonnull_ptr<T>& lhs, U* rhs)
+    noexcept (noexcept (rhs < lhs))
   {
     return rhs < lhs;
   }
@@ -946,6 +966,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator> (U* lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (rhs < lhs))
   {
     return rhs < lhs;
   }
@@ -963,6 +984,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator>= (const nonnull_ptr<T>& lhs, U* rhs)
+    noexcept (noexcept (! (lhs < rhs)))
   {
     return ! (lhs < rhs);
   }
@@ -980,6 +1002,7 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator>= (U* lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (! (lhs < rhs)))
   {
     return ! (lhs < rhs);
   }
@@ -1001,6 +1024,7 @@ namespace gch
   GCH_NODISCARD constexpr
   std::compare_three_way_result_t<typename nonnull_ptr<T>::pointer, U *>
   operator<=> (const nonnull_ptr<T>& lhs, U *rhs)
+    noexcept (noexcept (std::compare_three_way { } (lhs.get (), rhs)))
     requires std::three_way_comparable_with<typename nonnull_ptr<T>::pointer, U *>
   {
     return std::compare_three_way { } (lhs.get (), rhs);
