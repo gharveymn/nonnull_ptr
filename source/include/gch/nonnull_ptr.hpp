@@ -485,9 +485,10 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator< (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
-    noexcept (noexcept (std::less<typename std::common_type<
-      typename nonnull_ptr<T>::pointer,
-      typename nonnull_ptr<U>::pointer>::type> { } (lhs.get (), rhs.get ())))
+    noexcept (noexcept (
+      std::less<typename std::common_type<typename nonnull_ptr<T>::pointer,
+                                          typename nonnull_ptr<U>::pointer>::type> { } (
+        lhs.get (), rhs.get ())))
   {
     using common_ty = typename std::common_type<typename nonnull_ptr<T>::pointer,
                                                 typename nonnull_ptr<U>::pointer>::type;
@@ -872,8 +873,9 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator< (const nonnull_ptr<T>& lhs, U *rhs)
-    noexcept (noexcept (std::less<typename std::common_type<
-      typename nonnull_ptr<T>::pointer, U *>::type> { } (lhs.get (), rhs)))
+    noexcept (noexcept (
+      std::less<typename std::common_type<typename nonnull_ptr<T>::pointer, U *>::type> { } (
+        lhs.get (), rhs)))
   {
     using common_ty = typename std::common_type<typename nonnull_ptr<T>::pointer, U *>::type;
     return std::less<common_ty> { } (lhs.get (), rhs);
@@ -892,8 +894,9 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator< (U *lhs, const nonnull_ptr<T>& rhs)
-    noexcept (noexcept (std::less<typename std::common_type<
-      U *, typename nonnull_ptr<T>::pointer>::type> { } (lhs, rhs.get ())))
+    noexcept (noexcept (
+      std::less<typename std::common_type<U *, typename nonnull_ptr<T>::pointer>::type> { } (
+        lhs, rhs.get ())))
   {
     using common_ty = typename std::common_type<U *, typename nonnull_ptr<T>::pointer>::type;
     return std::less<common_ty> { } (lhs, rhs.get ());
