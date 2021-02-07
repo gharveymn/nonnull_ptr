@@ -135,14 +135,14 @@ namespace gch
 #endif
 
     // std::pointer_traits
-    using element_type    = Value;          /*!< The element type of the stored pointer */
+    using element_type = Value;               /*!< The element type of the stored pointer */
 
     template <typename U>
-    using rebind = nonnull_ptr<U>; /*!< A template for rebinding this type */
+    using rebind = nonnull_ptr<U>;            /*!< A template for rebinding this type */
 
     // other
-    using const_reference = const Value&;   /*!< A constant reference to `Value`      */
-    using const_pointer   = const Value *;  /*!< A constant pointer to `Value`        */
+    using const_reference = const Value&;     /*!< A constant reference to `Value`      */
+    using const_pointer   = const Value *;    /*!< A constant pointer to `Value`        */
 
   private:
     template <typename U>
@@ -154,42 +154,87 @@ namespace gch
       std::is_convertible<decltype (&std::declval<U&> ()), pointer>;
 
   public:
-    nonnull_ptr (void)                              = delete;
-    nonnull_ptr (const nonnull_ptr&)                = default;
-    nonnull_ptr (nonnull_ptr&&) noexcept            = default;
-    nonnull_ptr& operator= (const nonnull_ptr&)     = default;
-    nonnull_ptr& operator= (nonnull_ptr&&) noexcept = default;
+    /**
+     * Constructor
+     *
+     * A deleted default constructor
+     */
+    nonnull_ptr (void) = delete;
+
+    /**
+     * Constructor
+     *
+     * A copy constructor.
+     *
+     * The value of `other` is copied into `*this`.
+     *
+     * Note: TriviallyCopyable.
+     */
+    nonnull_ptr (const nonnull_ptr&) noexcept = default;
+
+    /**
+     * Constructor
+     *
+     * A move constructor.
+     *
+     * The value of `other` is copied into `*this`.
+     *
+     * Note: TriviallyCopyable.
+     */
+    nonnull_ptr (nonnull_ptr&&) noexcept = default;
+
+    /**
+     * Assignment operator
+     *
+     * A copy-assignment operator.
+     *
+     * The resultant state of `*this` is equivalent
+     * to that of `other`.
+     *
+     * Note: TriviallyCopyable.
+     *
+     * @return `*this`
+     */
+    nonnull_ptr&
+    operator= (const nonnull_ptr&) noexcept = default;
+
+    /**
+     * Assignment operator
+     *
+     * A move-assignment operator.
+     *
+     * Sets the state of `*this` to that of `other`.
+     * It is implementation defined if `other` contains
+     * a value after this.
+     *
+     * Note: TriviallyCopyable.
+     *
+     * @return `*this`
+     */
+    nonnull_ptr&
+    operator= (nonnull_ptr&&) noexcept = default;
+
+    /**
+     * Destructor
+     *
+     * A trivial destructor.
+     *
+     * Note: TriviallyCopyable.
+     *
+     */
     ~nonnull_ptr (void)                             = default;
 
     /**
      * Constructor
      *
-     * A constructor for the case where `decltype (&ref)`
-     * is implicitly convertible to type `pointer`.
-     *
-     * @tparam U a referenced value type.
-     * @param ref a reference whose pointer is implicitly convertible to type `pointer`.
-     */
-    template <typename U,
-              typename std::enable_if<constructible_from_pointer_to<U>::value
-                                  &&  pointer_to_is_convertible<U>::value>::type * = nullptr>
-    constexpr /* implicit */
-    nonnull_ptr (U& ref) noexcept
-      : m_ptr (&ref)
-    { }
-
-    /**
-     * Constructor
-     *
-     * A constructor for the case where `pointer` is
-     * explicitly constructible from `decltype (&ref)`.
+     * An explicit converting constructor for reference
+     * types explicitly convertible to `pointer`.
      *
      * @tparam U a referenced value type.
      * @param ref a argument from which `pointer` may be explicitly constructed.
      */
     template <typename U,
-              typename std::enable_if<constructible_from_pointer_to<U>::value
-                                  &&! pointer_to_is_convertible<U>::value>::type * = nullptr>
+              typename std::enable_if<constructible_from_pointer_to<U>::value>::type * = nullptr>
     constexpr explicit
     nonnull_ptr (U& ref) noexcept
       : m_ptr (&ref)
@@ -198,7 +243,7 @@ namespace gch
     /**
      * Constructor
      *
-     * A deleted contructor for the case where `ref` is an rvalue reference.
+     * A deleted constructor for the case where `ref` is an rvalue reference.
      */
     template <typename U,
               typename = typename std::enable_if<constructible_from_pointer_to<U>::value>::type>
@@ -294,7 +339,7 @@ namespace gch
     /**
      * Returns a pointer to the value.
      *
-     * Never fails. The return is the same as from `get`.
+     * The return is the same as from `get`.
      *
      * @return a pointer to the value.
      */
@@ -314,7 +359,7 @@ namespace gch
     void
     swap (nonnull_ptr& other) noexcept
     {
-      // manually done so we can lower the version requirements for constexpr
+      // manually implemented so we can lower the constexpr version requirements to c++14
       pointer tmp = m_ptr;
       m_ptr       = other.m_ptr;
       other.m_ptr = tmp;
@@ -402,10 +447,8 @@ namespace gch
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
+  bool
   operator== (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
-    noexcept (noexcept (l.get () == r.get ()))
-    -> decltype (l.get () == r.get ())
   {
     return l.get () == r.get ();
   }
@@ -421,10 +464,8 @@ namespace gch
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
+  bool
   operator!= (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
-    noexcept (noexcept (l.get () != r.get ()))
-    -> decltype (l.get () != r.get ())
   {
     return l.get () != r.get ();
   }
@@ -432,77 +473,71 @@ namespace gch
   /**
    * A less-than comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @tparam U the value type of `r`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `lhs`.
+   * @tparam U the value type of `rhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the less-than comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator< (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
-    noexcept (noexcept (l.get () < r.get ()))
-    -> decltype (l.get () < r.get ())
+  bool
+  operator< (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
   {
-    return l.get () < r.get ();
-  }
-
-  /**
-   * A greater-than comparison function.
-   *
-   * @tparam T the value type of `l`.
-   * @tparam U the value type of `r`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `nonnull_ptr`.
-   * @return the result of the greater-than comparison.
-   */
-  template <typename T, typename U>
-  GCH_NODISCARD constexpr
-  auto
-  operator> (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
-    noexcept (noexcept (l.get () > r.get ()))
-    -> decltype (l.get () > r.get ())
-  {
-    return l.get () > r.get ();
+    using common_ty = typename std::common_type<typename nonnull_ptr<T>::pointer,
+                                                typename nonnull_ptr<U>::pointer>::type;
+    return std::less<common_ty> { } (lhs.get (), rhs.get ());
   }
 
   /**
    * A less-than-equal comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @tparam U the value type of `r`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `lhs`.
+   * @tparam U the value type of `rhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the less-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator<= (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
-    noexcept (noexcept (l.get () <= r.get ()))
-    -> decltype (l.get () <= r.get ())
+  bool
+  operator<= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
   {
-    return l.get () <= r.get ();
+    return ! (rhs < lhs);
+  }
+
+  /**
+   * A greater-than comparison function.
+   *
+   * @tparam T the value type of `lhs`.
+   * @tparam U the value type of `rhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `nonnull_ptr`.
+   * @return the result of the greater-than comparison.
+   */
+  template <typename T, typename U>
+  GCH_NODISCARD constexpr
+  bool
+  operator> (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+  {
+    return rhs < lhs;
   }
 
   /**
    * A greater-than-equal comparison function
    *
-   * @tparam T the value type of `l`.
-   * @tparam U the value type of `r`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `lhs`.
+   * @tparam U the value type of `rhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator>= (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
-    noexcept (noexcept (l.get () >= r.get ()))
-    -> decltype (l.get () >= r.get ())
+  bool
+  operator>= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
   {
-    return l.get () >= r.get ();
+    return ! (lhs < rhs);
   }
 
 #ifdef GCH_LIB_THREE_WAY_COMPARISON
@@ -510,20 +545,21 @@ namespace gch
   /**
    * A three-way comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @tparam U the value type of `r`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `lhs`.
+   * @tparam U the value type of `rhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the three-way comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator<=> (const nonnull_ptr<T>& l, const nonnull_ptr<U>& r)
-    noexcept (noexcept (l.get () <=> r.get ()))
-    -> std::compare_three_way_result_t<decltype (l.get ()), decltype (r.get ())>
+  std::compare_three_way_result_t<typename nonnull_ptr<T>::pointer,
+                                  typename nonnull_ptr<U>::pointer>
+  operator<=> (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    requires std::three_way_comparable_with<typename nonnull_ptr<T>::pointer,
+                                            typename nonnull_ptr<U>::pointer>
   {
-    return l.get () <=> r.get ();
+    return std::compare_three_way { } (lhs.get (), rhs.get ());
   }
 
 #endif
@@ -531,9 +567,9 @@ namespace gch
   /**
    * An equality comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `std::nullptr_t`.
+   * @tparam T the value type of `lhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `std::nullptr_t`.
    * @return the result of the equality comparison.
    */
   template <typename T>
@@ -549,9 +585,9 @@ namespace gch
   /**
    * A three-way comparison function.
    *
-   * @tparam T the value type of `r`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `std::nullptr_t`.
+   * @tparam T the value type of `rhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `std::nullptr_t`.
    * @return the result of the three-way comparison.
    */
   template <typename T>
@@ -567,9 +603,9 @@ namespace gch
   /**
    * An equality comparison function.
    *
-   * @tparam T the value type of `r`.
-   * @param l a `std::nullptr_t`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `rhs`.
+   * @param lhs a `std::nullptr_t`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the equality comparison.
    */
   template <typename T>
@@ -583,9 +619,9 @@ namespace gch
   /**
    * An inequality comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `std::nullptr_t`.
+   * @tparam T the value type of `lhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `std::nullptr_t`.
    * @return the result of the inequality comparison.
    */
   template <typename T>
@@ -599,9 +635,9 @@ namespace gch
   /**
    * An inequality comparison function.
    *
-   * @tparam T the value type of `r`.
-   * @param l a `std::nullptr_t`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `rhs`.
+   * @param lhs a `std::nullptr_t`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the inequality comparison.
    */
   template <typename T>
@@ -615,9 +651,9 @@ namespace gch
   /**
    * A less-than comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `std::nullptr_t`.
+   * @tparam T the value type of `lhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `std::nullptr_t`.
    * @return the result of the less-than comparison.
    */
   template <typename T>
@@ -631,9 +667,9 @@ namespace gch
   /**
    * A less-than comparison function.
    *
-   * @tparam T the value type of `r`.
-   * @param l a `std::nullptr_t`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `rhs`.
+   * @param lhs a `std::nullptr_t`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the less-than comparison.
    */
   template <typename T>
@@ -647,9 +683,9 @@ namespace gch
   /**
    * A greater-than comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `std::nullptr_t`.
+   * @tparam T the value type of `lhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `std::nullptr_t`.
    * @return the result of the greater-than comparison.
    */
   template <typename T>
@@ -663,9 +699,9 @@ namespace gch
   /**
    * A greater-than comparison function.
    *
-   * @tparam T the value type of `r`.
-   * @param l a `std::nullptr_t`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `rhs`.
+   * @param lhs a `std::nullptr_t`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the greater-than comparison.
    */
   template <typename T>
@@ -679,9 +715,9 @@ namespace gch
   /**
    * A less-than-equal comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `std::nullptr_t`.
+   * @tparam T the value type of `lhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `std::nullptr_t`.
    * @return the result of the less-than-equal comparison.
    */
   template <typename T>
@@ -695,9 +731,9 @@ namespace gch
   /**
    * A less-than-equal comparison function.
    *
-   * @tparam T the value type of `r`.
-   * @param l a `std::nullptr_t`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `rhs`.
+   * @param lhs a `std::nullptr_t`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the less-than-equal comparison.
    */
   template <typename T>
@@ -711,9 +747,9 @@ namespace gch
   /**
    * A greater-than-equal comparison function.
    *
-   * @tparam T the value type of `l`.
-   * @param l a `nonnull_ptr`.
-   * @param r a `std::nullptr_t`.
+   * @tparam T the value type of `lhs`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `std::nullptr_t`.
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T>
@@ -727,9 +763,9 @@ namespace gch
   /**
    * A greater-than-equal comparison function.
    *
-   * @tparam T the value type of `r`.
-   * @param l a `std::nullptr_t`.
-   * @param r a `nonnull_ptr`.
+   * @tparam T the value type of `rhs`.
+   * @param lhs a `std::nullptr_t`.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T>
@@ -745,229 +781,207 @@ namespace gch
   /**
    * An equality comparison function.
    *
-   * @tparam T the value type of `l`.
+   * @tparam T the value type of `lhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a `nonnull_ptr`.
-   * @param r a comparable pointer.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a comparable pointer.
    * @return the result of the equality comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator== (const nonnull_ptr<T>& l, U* r)
-    noexcept (noexcept (l.get () == r))
-    -> decltype (l.get () == r)
+  bool
+  operator== (const nonnull_ptr<T>& lhs, U *rhs)
   {
-    return l.get () == r;
+    return lhs.get () == rhs;
   }
 
   /**
    * An equality comparison function.
    *
-   * @tparam T the value type of `r`.
+   * @tparam T the value type of `rhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a comparable pointer.
-   * @param r a `nonnull_ptr`.
+   * @param lhs a comparable pointer.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the equality comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator== (U* l, const nonnull_ptr<T>& r)
-    noexcept (noexcept (l == r.get ()))
-    -> decltype (l == r.get ())
+  bool
+  operator== (U *lhs, const nonnull_ptr<T>& rhs)
   {
-    return l == r.get ();
+    return lhs == rhs.get ();
   }
 
   /**
    * An inequality comparison function.
    *
-   * @tparam T the value type of `l`.
+   * @tparam T the value type of `lhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a `nonnull_ptr`.
-   * @param r a comparable pointer.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a comparable pointer.
    * @return the result of the inequality comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator!= (const nonnull_ptr<T>& l, U* r)
-    noexcept (noexcept (l.get () != r))
-    -> decltype (l.get () != r)
+  bool
+  operator!= (const nonnull_ptr<T>& lhs, U *rhs)
   {
-    return l.get () != r;
+    return lhs.get () != rhs;
   }
 
   /**
    * An inequality comparison function.
    *
-   * @tparam T the value type of `r`.
+   * @tparam T the value type of `rhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a comparable pointer.
-   * @param r a `nonnull_ptr`.
+   * @param lhs a comparable pointer.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the inequality comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator!= (U* l, const nonnull_ptr<T>& r)
-    noexcept (noexcept (l != r.get ()))
-    -> decltype (l != r.get ())
+  bool
+  operator!= (U *lhs, const nonnull_ptr<T>& rhs)
   {
-    return l != r.get ();
+    return lhs != rhs.get ();
   }
 
   /**
    * A less-than comparison function.
    *
-   * @tparam T the value type of `l`.
+   * @tparam T the value type of `lhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a `nonnull_ptr`.
-   * @param r a comparable pointer.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a comparable pointer.
    * @return the result of the less-than comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator< (const nonnull_ptr<T>& l, U* r)
-    noexcept (noexcept (l.get () < r))
-    -> decltype (l.get () < r)
+  bool
+  operator< (const nonnull_ptr<T>& lhs, U *rhs)
   {
-    return l.get () < r;
+    using common_ty = typename std::common_type<typename nonnull_ptr<T>::pointer, U *>::type;
+    return std::less<common_ty> { } (lhs.get (), rhs);
   }
 
   /**
    * A less-than comparison function.
    *
-   * @tparam T the value type of `r`.
+   * @tparam T the value type of `rhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a comparable pointer.
-   * @param r a `nonnull_ptr`.
+   * @param lhs a comparable pointer.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the less-than comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator< (U* l, const nonnull_ptr<T>& r)
-    noexcept (noexcept (l < r.get ()))
-    -> decltype (l < r.get ())
+  bool
+  operator< (U *lhs, const nonnull_ptr<T>& rhs)
   {
-    return l < r.get ();
-  }
-
-  /**
-   * A greater-than comparison function.
-   *
-   * @tparam T the value type of `l`.
-   * @tparam U a value type which is comparable to `T *`.
-   * @param l a `nonnull_ptr`.
-   * @param r a comparable pointer.
-   * @return the result of the greater-than comparison.
-   */
-  template <typename T, typename U>
-  GCH_NODISCARD constexpr
-  auto
-  operator> (const nonnull_ptr<T>& l, U* r)
-    noexcept (noexcept (l.get () > r))
-    -> decltype (l.get () > r)
-  {
-    return l.get () > r;
-  }
-
-  /**
-   * A greater-than comparison function.
-   *
-   * @tparam T the value type of `r`.
-   * @tparam U a value type which is comparable to `T *`.
-   * @param l a comparable pointer.
-   * @param r a `nonnull_ptr`.
-   * @return the result of the greater-than comparison.
-   */
-  template <typename T, typename U>
-  GCH_NODISCARD constexpr
-  auto
-  operator> (U* l, const nonnull_ptr<T>& r)
-    noexcept (noexcept (l > r.get ()))
-    -> decltype (l > r.get ())
-  {
-    return l > r.get ();
+    using common_ty = typename std::common_type<U *, typename nonnull_ptr<T>::pointer>::type;
+    return std::less<common_ty> { } (lhs, rhs.get ());
   }
 
   /**
    * A less-than-equal comparison function.
    *
-   * @tparam T the value type of `l`.
+   * @tparam T the value type of `lhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a `nonnull_ptr`.
-   * @param r a comparable pointer.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a comparable pointer.
    * @return the result of the less-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator<= (const nonnull_ptr<T>& l, U* r)
-    noexcept (noexcept (l.get () <= r))
-    -> decltype (l.get () <= r)
+  bool
+  operator<= (const nonnull_ptr<T>& lhs, U *rhs)
   {
-    return l.get () <= r;
+    return ! (rhs < lhs);
   }
 
   /**
    * A less-than-equal comparison function.
    *
-   * @tparam T the value type of `r`.
+   * @tparam T the value type of `rhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a comparable pointer.
-   * @param r a `nonnull_ptr`.
+   * @param lhs a comparable pointer.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the less-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator<= (U* l, const nonnull_ptr<T>& r)
-    noexcept (noexcept (l <= r.get ()))
-    -> decltype (l <= r.get ())
+  bool
+  operator<= (U *lhs, const nonnull_ptr<T>& rhs)
   {
-    return l <= r.get ();
+    return ! (rhs < lhs);
+  }
+
+  /**
+   * A greater-than comparison function.
+   *
+   * @tparam T the value type of `lhs`.
+   * @tparam U a value type which is comparable to `T *`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a comparable pointer.
+   * @return the result of the greater-than comparison.
+   */
+  template <typename T, typename U>
+  GCH_NODISCARD constexpr
+  bool
+  operator> (const nonnull_ptr<T>& lhs, U* rhs)
+  {
+    return rhs < lhs;
+  }
+
+  /**
+   * A greater-than comparison function.
+   *
+   * @tparam T the value type of `rhs`.
+   * @tparam U a value type which is comparable to `T *`.
+   * @param lhs a comparable pointer.
+   * @param rhs a `nonnull_ptr`.
+   * @return the result of the greater-than comparison.
+   */
+  template <typename T, typename U>
+  GCH_NODISCARD constexpr
+  bool
+  operator> (U* lhs, const nonnull_ptr<T>& rhs)
+  {
+    return rhs < lhs;
   }
 
   /**
    * A greater-than-equal comparison function.
    *
-   * @tparam T the value type of `l`.
+   * @tparam T the value type of `lhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a `nonnull_ptr`.
-   * @param r a comparable pointer.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a comparable pointer.
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator>= (const nonnull_ptr<T>& l, U* r)
-    noexcept (noexcept (l.get () >= r))
-    -> decltype (l.get () >= r)
+  bool
+  operator>= (const nonnull_ptr<T>& lhs, U* rhs)
   {
-    return l.get () >= r;
+    return ! (lhs < rhs);
   }
 
   /**
    * A greater-than-equal comparison function.
    *
-   * @tparam T the value type of `r`.
+   * @tparam T the value type of `rhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l a comparable pointer.
-   * @param r a `nonnull_ptr`.
+   * @param lhs a comparable pointer.
+   * @param rhs a `nonnull_ptr`.
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator>= (U* l, const nonnull_ptr<T>& r)
-    noexcept (noexcept (l >= r.get ()))
-    -> decltype (l >= r.get ())
+  bool
+  operator>= (U* lhs, const nonnull_ptr<T>& rhs)
   {
-    return l >= r.get ();
+    return ! (lhs < rhs);
   }
 
 #ifdef GCH_LIB_THREE_WAY_COMPARISON
@@ -975,22 +989,21 @@ namespace gch
   /**
    * A three-way comparison function.
    *
-   * @tparam T the value type of `l`.
+   * @tparam T the value type of `lhs`.
    * @tparam U a value type which is comparable to `T *`.
-   * @param l an `nonnull_ptr`.
-   * @param r a comparable lvalue reference.
+   * @param lhs an `nonnull_ptr`.
+   * @param rhs a comparable lvalue reference.
    * @return the result of the three-way comparison.
    *
    * @see std::optional::operator<=>
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
-  auto
-  operator<=> (const nonnull_ptr<T>& l, const U *r)
-    noexcept (noexcept (l.get () <=> r))
-    -> std::compare_three_way_result_t<decltype (l.get ()), decltype (r)>
+  std::compare_three_way_result_t<typename nonnull_ptr<T>::pointer, U *>
+  operator<=> (const nonnull_ptr<T>& lhs, U *rhs)
+    requires std::three_way_comparable_with<typename nonnull_ptr<T>::pointer, U *>
   {
-    return l.get () <=> r;
+    return std::compare_three_way { } (lhs.get (), rhs);
   }
 
 #endif
@@ -1001,15 +1014,15 @@ namespace gch
    * Swaps the two `nonnull_ptr`s of the same type.
    *
    * @tparam T the value type pointed to by the `nonnull_ptr`s
-   * @param l a `nonnull_ptr`.
-   * @param r a `nonnull_ptr`.
+   * @param lhs a `nonnull_ptr`.
+   * @param rhs a `nonnull_ptr`.
    */
   template <typename T>
   inline GCH_CPP14_CONSTEXPR
   void
-  swap (nonnull_ptr<T>& l, nonnull_ptr<T>& r) noexcept
+  swap (nonnull_ptr<T>& lhs, nonnull_ptr<T>& rhs) noexcept
   {
-    l.swap (r);
+    lhs.swap (rhs);
   }
 
   /**
