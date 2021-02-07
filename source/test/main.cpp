@@ -31,14 +31,14 @@ template auto gch::nonnull_ptr<base>::emplace (const derived&&) -> reference;
 
 #endif
 
-template bool gch::operator== (const nonnull_ptr<int>&, const nonnull_ptr<int>&) noexcept;
-template bool gch::operator!= (const nonnull_ptr<int>&, const nonnull_ptr<int>&) noexcept;
-template bool gch::operator<  (const nonnull_ptr<int>&, const nonnull_ptr<int>&) noexcept;
-template bool gch::operator>  (const nonnull_ptr<int>&, const nonnull_ptr<int>&) noexcept;
-template bool gch::operator<= (const nonnull_ptr<int>&, const nonnull_ptr<int>&) noexcept;
-template bool gch::operator>= (const nonnull_ptr<int>&, const nonnull_ptr<int>&) noexcept;
+template bool gch::operator== (const nonnull_ptr<int>&, const nonnull_ptr<int>&);
+template bool gch::operator!= (const nonnull_ptr<int>&, const nonnull_ptr<int>&);
+template bool gch::operator<  (const nonnull_ptr<int>&, const nonnull_ptr<int>&);
+template bool gch::operator>  (const nonnull_ptr<int>&, const nonnull_ptr<int>&);
+template bool gch::operator<= (const nonnull_ptr<int>&, const nonnull_ptr<int>&);
+template bool gch::operator>= (const nonnull_ptr<int>&, const nonnull_ptr<int>&);
 #ifdef GCH_LIB_THREE_WAY_COMPARISON
-template std::strong_ordering gch::operator<=> (const nonnull_ptr<int>&, const nonnull_ptr<int>&) noexcept;
+template std::strong_ordering gch::operator<=> (const nonnull_ptr<int>&, const nonnull_ptr<int>&);
 #endif
 
 template bool gch::operator== (const nonnull_ptr<int>&, std::nullptr_t) noexcept;
@@ -46,32 +46,32 @@ template bool gch::operator== (const nonnull_ptr<int>&, std::nullptr_t) noexcept
 template std::strong_ordering gch::operator<=> (const nonnull_ptr<int>&, std::nullptr_t) noexcept;
 #else
 template bool gch::operator== (std::nullptr_t,          const nonnull_ptr<int>&) noexcept;
-template bool gch::operator!= (const nonnull_ptr<int>&, std::nullptr_t          ) noexcept;
+template bool gch::operator!= (const nonnull_ptr<int>&, std::nullptr_t         ) noexcept;
 template bool gch::operator!= (std::nullptr_t,          const nonnull_ptr<int>&) noexcept;
-template bool gch::operator<  (const nonnull_ptr<int>&, std::nullptr_t          ) noexcept;
+template bool gch::operator<  (const nonnull_ptr<int>&, std::nullptr_t         ) noexcept;
 template bool gch::operator<  (std::nullptr_t,          const nonnull_ptr<int>&) noexcept;
-template bool gch::operator>  (const nonnull_ptr<int>&, std::nullptr_t          ) noexcept;
+template bool gch::operator>  (const nonnull_ptr<int>&, std::nullptr_t         ) noexcept;
 template bool gch::operator>  (std::nullptr_t,          const nonnull_ptr<int>&) noexcept;
-template bool gch::operator<= (const nonnull_ptr<int>&, std::nullptr_t          ) noexcept;
+template bool gch::operator<= (const nonnull_ptr<int>&, std::nullptr_t         ) noexcept;
 template bool gch::operator<= (std::nullptr_t,          const nonnull_ptr<int>&) noexcept;
-template bool gch::operator>= (const nonnull_ptr<int>&, std::nullptr_t          ) noexcept;
+template bool gch::operator>= (const nonnull_ptr<int>&, std::nullptr_t         ) noexcept;
 template bool gch::operator>= (std::nullptr_t,          const nonnull_ptr<int>&) noexcept;
 #endif
 
-template bool gch::operator== (const nonnull_ptr<int>&, const int *             ) noexcept;
+template bool gch::operator== (const nonnull_ptr<int>&, const int *            ) noexcept;
 template bool gch::operator== (const int *,             const nonnull_ptr<int>&) noexcept;
-template bool gch::operator!= (const nonnull_ptr<int>&, const int *             ) noexcept;
+template bool gch::operator!= (const nonnull_ptr<int>&, const int *            ) noexcept;
 template bool gch::operator!= (const int *,             const nonnull_ptr<int>&) noexcept;
-template bool gch::operator<  (const nonnull_ptr<int>&, const int *             ) noexcept;
-template bool gch::operator<  (const int *,             const nonnull_ptr<int>&) noexcept;
-template bool gch::operator>  (const nonnull_ptr<int>&, const int *             ) noexcept;
-template bool gch::operator>  (const int *,             const nonnull_ptr<int>&) noexcept;
-template bool gch::operator<= (const nonnull_ptr<int>&, const int *             ) noexcept;
-template bool gch::operator<= (const int *,             const nonnull_ptr<int>&) noexcept;
-template bool gch::operator>= (const nonnull_ptr<int>&, const int *             ) noexcept;
-template bool gch::operator>= (const int *,             const nonnull_ptr<int>&) noexcept;
+template bool gch::operator<  (const nonnull_ptr<int>&, const int *            );
+template bool gch::operator<  (const int *,             const nonnull_ptr<int>&);
+template bool gch::operator>  (const nonnull_ptr<int>&, const int *            );
+template bool gch::operator>  (const int *,             const nonnull_ptr<int>&);
+template bool gch::operator<= (const nonnull_ptr<int>&, const int *            );
+template bool gch::operator<= (const int *,             const nonnull_ptr<int>&);
+template bool gch::operator>= (const nonnull_ptr<int>&, const int *            );
+template bool gch::operator>= (const int *,             const nonnull_ptr<int>&);
 #ifdef GCH_LIB_THREE_WAY_COMPARISON
-template std::strong_ordering gch::operator<=> (const nonnull_ptr<int>&, const int *) noexcept;
+template std::strong_ordering gch::operator<=> (const nonnull_ptr<int>&, const int *);
 #endif
 
 static_assert (std::is_trivially_copyable<nonnull_ptr<int>>::value, "");
@@ -152,25 +152,31 @@ void test_assign (void)
   print_test_footer ();
 }
 
+struct my_struct_base
+{
+  int x;
+};
+
+struct my_struct : my_struct_base
+{ };
+
+constexpr
+bool
+operator== (const my_struct_base& lhs, const my_struct_base& rhs) noexcept
+{
+  return lhs.x == rhs.x;
+}
+
+constexpr
+bool
+operator!= (const my_struct_base& lhs, const my_struct_base& rhs) noexcept
+{
+  return lhs.x != rhs.x;
+}
+
 void test_inheritence (void)
 {
   print_test_header ("test inheritence");
-  struct my_struct_base
-  {
-    int x;
-    constexpr bool operator== (my_struct_base& other) const noexcept
-    {
-      return this->x == other.x;
-    }
-
-    constexpr bool operator!= (my_struct_base& other) const noexcept
-    {
-      return ! operator== (other);
-    }
-  };
-
-  struct my_struct : my_struct_base
-  { };
 
   my_struct s0 { };
   my_struct s1 { };
@@ -488,7 +494,7 @@ void test_perf_equality (void)
     auto mean = std::accumulate (times.begin (), times.end (), 0.0) / num_tests;
 
     auto variance = std::accumulate (times.begin (), times.end (), 0.0,
-                                     [&mean, num_tests] (double accum, const double& val)
+                                     [&] (double accum, const double& val)
                                      {
                                        return accum +
                                          (std::pow (val - mean, 2.0) / (num_tests - 1));
@@ -504,7 +510,7 @@ void test_perf_equality (void)
     auto mean = std::accumulate (times.begin (), times.end (), 0.0) / num_tests;
 
     auto variance = std::accumulate (times.begin (), times.end (), 0.0,
-                                     [&mean, num_tests] (double accum, const double& val)
+                                     [&] (double accum, const double& val)
                                      {
                                        return accum +
                                          (std::pow (val - mean, 2.0) / (num_tests - 1));

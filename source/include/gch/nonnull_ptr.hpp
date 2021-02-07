@@ -495,21 +495,21 @@ namespace gch
   }
 
   /**
-   * A less-than-equal comparison function.
+   * A greater-than-equal comparison function
    *
    * @tparam T the value type of `lhs`.
    * @tparam U the value type of `rhs`.
    * @param lhs a `nonnull_ptr`.
    * @param rhs a `nonnull_ptr`.
-   * @return the result of the less-than-equal comparison.
+   * @return the result of the greater-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator<= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
-    noexcept (noexcept (! (rhs < lhs)))
+  operator>= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (! (lhs < rhs)))
   {
-    return ! (rhs < lhs);
+    return ! (lhs < rhs);
   }
 
   /**
@@ -531,21 +531,21 @@ namespace gch
   }
 
   /**
-   * A greater-than-equal comparison function
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `lhs`.
    * @tparam U the value type of `rhs`.
    * @param lhs a `nonnull_ptr`.
    * @param rhs a `nonnull_ptr`.
-   * @return the result of the greater-than-equal comparison.
+   * @return the result of the less-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator>= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
-    noexcept (noexcept (! (lhs < rhs)))
+  operator<= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
+    noexcept (noexcept (! (rhs < lhs)))
   {
-    return ! (lhs < rhs);
+    return rhs >= lhs;
   }
 
 #ifdef GCH_LIB_THREE_WAY_COMPARISON
@@ -690,35 +690,35 @@ namespace gch
   }
 
   /**
-   * A less-than-equal comparison function.
+   * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `lhs`.
    * @param lhs a `nonnull_ptr`.
    * @param rhs a `std::nullptr_t`.
-   * @return the result of the less-than-equal comparison.
+   * @return the result of the greater-than-equal comparison.
    */
   template <typename T>
   GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
-  operator<= (const nonnull_ptr<T>&, std::nullptr_t) noexcept
+  operator>= (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
-    return false;
+    return true;
   }
 
   /**
-   * A less-than-equal comparison function.
+   * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `rhs`.
    * @param lhs a `std::nullptr_t`.
    * @param rhs a `nonnull_ptr`.
-   * @return the result of the less-than-equal comparison.
+   * @return the result of the greater-than-equal comparison.
    */
   template <typename T>
   GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
-  operator<= (std::nullptr_t, const nonnull_ptr<T>&) noexcept
+  operator>= (std::nullptr_t, const nonnull_ptr<T>&) noexcept
   {
-    return true;
+    return false;
   }
 
   /**
@@ -754,35 +754,35 @@ namespace gch
   }
 
   /**
-   * A greater-than-equal comparison function.
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `lhs`.
    * @param lhs a `nonnull_ptr`.
    * @param rhs a `std::nullptr_t`.
-   * @return the result of the greater-than-equal comparison.
+   * @return the result of the less-than-equal comparison.
    */
   template <typename T>
   GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
-  operator>= (const nonnull_ptr<T>&, std::nullptr_t) noexcept
+  operator<= (const nonnull_ptr<T>&, std::nullptr_t) noexcept
   {
-    return true;
+    return false;
   }
 
   /**
-   * A greater-than-equal comparison function.
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `rhs`.
    * @param lhs a `std::nullptr_t`.
    * @param rhs a `nonnull_ptr`.
-   * @return the result of the greater-than-equal comparison.
+   * @return the result of the less-than-equal comparison.
    */
   template <typename T>
   GCH_NODISCARD GCH_CPP20_CONSTEVAL
   bool
-  operator>= (std::nullptr_t, const nonnull_ptr<T>&) noexcept
+  operator<= (std::nullptr_t, const nonnull_ptr<T>&) noexcept
   {
-    return false;
+    return true;
   }
 
 #endif
@@ -893,46 +893,46 @@ namespace gch
   bool
   operator< (U *lhs, const nonnull_ptr<T>& rhs)
     noexcept (noexcept (std::less<typename std::common_type<
-      typename nonnull_ptr<T>::pointer, U *>::type> { } (lhs, rhs.get ())))
+      U *, typename nonnull_ptr<T>::pointer>::type> { } (lhs, rhs.get ())))
   {
     using common_ty = typename std::common_type<U *, typename nonnull_ptr<T>::pointer>::type;
     return std::less<common_ty> { } (lhs, rhs.get ());
   }
 
   /**
-   * A less-than-equal comparison function.
+   * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `lhs`.
    * @tparam U a value type which is comparable to `T *`.
    * @param lhs a `nonnull_ptr`.
    * @param rhs a comparable pointer.
-   * @return the result of the less-than-equal comparison.
+   * @return the result of the greater-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator<= (const nonnull_ptr<T>& lhs, U *rhs)
-    noexcept (noexcept (! (rhs < lhs)))
+  operator>= (const nonnull_ptr<T>& lhs, U* rhs)
+    noexcept (noexcept (! (lhs < rhs)))
   {
-    return ! (rhs < lhs);
+    return ! (lhs < rhs);
   }
 
   /**
-   * A less-than-equal comparison function.
+   * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `rhs`.
    * @tparam U a value type which is comparable to `T *`.
    * @param lhs a comparable pointer.
    * @param rhs a `nonnull_ptr`.
-   * @return the result of the less-than-equal comparison.
+   * @return the result of the greater-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator<= (U *lhs, const nonnull_ptr<T>& rhs)
-    noexcept (noexcept (! (rhs < lhs)))
+  operator>= (U* lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (! (lhs < rhs)))
   {
-    return ! (rhs < lhs);
+    return ! (lhs < rhs);
   }
 
   /**
@@ -972,39 +972,39 @@ namespace gch
   }
 
   /**
-   * A greater-than-equal comparison function.
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `lhs`.
    * @tparam U a value type which is comparable to `T *`.
    * @param lhs a `nonnull_ptr`.
    * @param rhs a comparable pointer.
-   * @return the result of the greater-than-equal comparison.
+   * @return the result of the less-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator>= (const nonnull_ptr<T>& lhs, U* rhs)
-    noexcept (noexcept (! (lhs < rhs)))
+  operator<= (const nonnull_ptr<T>& lhs, U *rhs)
+    noexcept (noexcept (rhs >= lhs))
   {
-    return ! (lhs < rhs);
+    return rhs >= lhs;
   }
 
   /**
-   * A greater-than-equal comparison function.
+   * A less-than-equal comparison function.
    *
    * @tparam T the value type of `rhs`.
    * @tparam U a value type which is comparable to `T *`.
    * @param lhs a comparable pointer.
    * @param rhs a `nonnull_ptr`.
-   * @return the result of the greater-than-equal comparison.
+   * @return the result of the less-than-equal comparison.
    */
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator>= (U* lhs, const nonnull_ptr<T>& rhs)
-    noexcept (noexcept (! (lhs < rhs)))
+  operator<= (U *lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (rhs >= lhs))
   {
-    return ! (lhs < rhs);
+    return rhs >= lhs;
   }
 
 #ifdef GCH_LIB_THREE_WAY_COMPARISON
