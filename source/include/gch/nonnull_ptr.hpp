@@ -75,6 +75,14 @@
 #  endif
 #endif
 
+#ifndef GCH_IMPLICIT_CONVERSION
+#  if defined (__cpp_conditional_explicit) && __cpp_conditional_explicit >= 201806
+#    define GCH_IMPLICIT_CONVERSION explicit (false)
+#  else
+#    define GCH_IMPLICIT_CONVERSION /* implicit */
+#  endif
+#endif
+
 #if defined (__cpp_deduction_guides) && __cpp_deduction_guides >= 201703
 #  ifndef GCH_CTAD_SUPPORT
 #    define GCH_CTAD_SUPPORT
@@ -262,7 +270,7 @@ namespace gch
     template <typename U,
               typename std::enable_if<std::is_constructible<pointer, U *>::value
                                   &&  std::is_convertible<U *, pointer>::value>::type * = nullptr>
-    constexpr /* implicit */
+    constexpr GCH_IMPLICIT_CONVERSION
     nonnull_ptr (const nonnull_ptr<U>& other) noexcept
       : m_ptr (other.get ())
     { }
@@ -292,7 +300,7 @@ namespace gch
      *
      * @return the stored pointer.
      */
-    GCH_NODISCARD constexpr /* implicit */
+    GCH_NODISCARD constexpr GCH_IMPLICIT_CONVERSION
     operator pointer (void) const noexcept
     {
       return m_ptr;
