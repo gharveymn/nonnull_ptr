@@ -586,8 +586,6 @@ namespace gch
    * An equality comparison function.
    *
    * @tparam T the value type of `lhs`.
-   * @param lhs a `nonnull_ptr`.
-   * @param rhs a `std::nullptr_t`.
    * @return the result of the equality comparison.
    */
   template <typename T>
@@ -604,8 +602,6 @@ namespace gch
    * A three-way comparison function.
    *
    * @tparam T the value type of `rhs`.
-   * @param lhs a `nonnull_ptr`.
-   * @param rhs a `std::nullptr_t`.
    * @return the result of the three-way comparison.
    */
   template <typename T>
@@ -622,8 +618,6 @@ namespace gch
    * An equality comparison function.
    *
    * @tparam T the value type of `rhs`.
-   * @param lhs a `std::nullptr_t`.
-   * @param rhs a `nonnull_ptr`.
    * @return the result of the equality comparison.
    */
   template <typename T>
@@ -638,8 +632,6 @@ namespace gch
    * An inequality comparison function.
    *
    * @tparam T the value type of `lhs`.
-   * @param lhs a `nonnull_ptr`.
-   * @param rhs a `std::nullptr_t`.
    * @return the result of the inequality comparison.
    */
   template <typename T>
@@ -654,8 +646,6 @@ namespace gch
    * An inequality comparison function.
    *
    * @tparam T the value type of `rhs`.
-   * @param lhs a `std::nullptr_t`.
-   * @param rhs a `nonnull_ptr`.
    * @return the result of the inequality comparison.
    */
   template <typename T>
@@ -670,8 +660,6 @@ namespace gch
    * A less-than comparison function.
    *
    * @tparam T the value type of `lhs`.
-   * @param lhs a `nonnull_ptr`.
-   * @param rhs a `std::nullptr_t`.
    * @return the result of the less-than comparison.
    */
   template <typename T>
@@ -686,8 +674,6 @@ namespace gch
    * A less-than comparison function.
    *
    * @tparam T the value type of `rhs`.
-   * @param lhs a `std::nullptr_t`.
-   * @param rhs a `nonnull_ptr`.
    * @return the result of the less-than comparison.
    */
   template <typename T>
@@ -702,8 +688,6 @@ namespace gch
    * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `lhs`.
-   * @param lhs a `nonnull_ptr`.
-   * @param rhs a `std::nullptr_t`.
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T>
@@ -718,8 +702,6 @@ namespace gch
    * A greater-than-equal comparison function.
    *
    * @tparam T the value type of `rhs`.
-   * @param lhs a `std::nullptr_t`.
-   * @param rhs a `nonnull_ptr`.
    * @return the result of the greater-than-equal comparison.
    */
   template <typename T>
@@ -734,8 +716,6 @@ namespace gch
    * A greater-than comparison function.
    *
    * @tparam T the value type of `lhs`.
-   * @param lhs a `nonnull_ptr`.
-   * @param rhs a `std::nullptr_t`.
    * @return the result of the greater-than comparison.
    */
   template <typename T>
@@ -750,8 +730,6 @@ namespace gch
    * A greater-than comparison function.
    *
    * @tparam T the value type of `rhs`.
-   * @param lhs a `std::nullptr_t`.
-   * @param rhs a `nonnull_ptr`.
    * @return the result of the greater-than comparison.
    */
   template <typename T>
@@ -766,8 +744,6 @@ namespace gch
    * A less-than-equal comparison function.
    *
    * @tparam T the value type of `lhs`.
-   * @param lhs a `nonnull_ptr`.
-   * @param rhs a `std::nullptr_t`.
    * @return the result of the less-than-equal comparison.
    */
   template <typename T>
@@ -782,8 +758,6 @@ namespace gch
    * A less-than-equal comparison function.
    *
    * @tparam T the value type of `rhs`.
-   * @param lhs a `std::nullptr_t`.
-   * @param rhs a `nonnull_ptr`.
    * @return the result of the less-than-equal comparison.
    */
   template <typename T>
@@ -1118,7 +1092,7 @@ namespace std
      *
      * We just forward to std::hash on the underlying pointer.
      *
-     * @param nn a reference to a value of type `gch::nonnull_ptr`.
+     * @param ptr a reference to a value of type `gch::nonnull_ptr`.
      * @return a hash of the argument.
      */
     std::size_t
