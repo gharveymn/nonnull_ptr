@@ -10,4 +10,6 @@ ELSE()
   OPTION(NONNULL_PTR_BUILD_TESTS "Set to ON to build tests" OFF)
 ENDIF()
 
+OPTION (GCH_USE_LIBCXX_WITH_CLANG "Set to ON to use libc++ when compiling with Clang" OFF)
+
 ADD_SUBDIRECTORY(source)
