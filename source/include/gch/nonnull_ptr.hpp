@@ -76,14 +76,14 @@
 #endif
 
 #ifndef GCH_IMPLICIT_CONVERSION
-#  if defined (__cpp_conditional_explicit) && __cpp_conditional_explicit >= 201806
+#  if defined (__cpp_conditional_explicit) && __cpp_conditional_explicit >= 201806L
 #    define GCH_IMPLICIT_CONVERSION explicit (false)
 #  else
 #    define GCH_IMPLICIT_CONVERSION /* implicit */
 #  endif
 #endif
 
-#if defined (__cpp_deduction_guides) && __cpp_deduction_guides >= 201703
+#if defined (__cpp_deduction_guides) && __cpp_deduction_guides >= 201703L
 #  ifndef GCH_CTAD_SUPPORT
 #    define GCH_CTAD_SUPPORT
 #  endif

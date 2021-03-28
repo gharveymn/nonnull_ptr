@@ -416,7 +416,7 @@ void test_hash (void)
 
 void test_deduction (void)
 {
-#if __cpp_deduction_guides >= 201703
+#if __cpp_deduction_guides >= 201703L
   print_test_header ("test deduction");
 
   int  x = 1;
