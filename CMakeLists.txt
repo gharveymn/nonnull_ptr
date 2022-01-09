@@ -1,15 +1,36 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.13)
-PROJECT(nonnull_ptr
-        VERSION 0.0.3
-        LANGUAGES CXX)
+cmake_minimum_required (VERSION 3.15)
+
+project (
+  nonnull_ptr
+  VERSION
+    0.0.4
+  LANGUAGES
+    CXX
+)
 
 # Options
-IF(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-  OPTION(NONNULL_PTR_BUILD_TESTS "Set to ON to build tests" ON)
-ELSE()
-  OPTION(NONNULL_PTR_BUILD_TESTS "Set to ON to build tests" OFF)
-ENDIF()
+string (COMPARE EQUAL "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}" _EXTRAS_DEFAULT)
 
-OPTION (GCH_USE_LIBCXX_WITH_CLANG "Set to ON to use libc++ when compiling with Clang" OFF)
+option (
+  GCH_NONNULL_PTR_BUILD_TESTS
+  "Set to ON to build tests for gch::nonnull_ptr."
+  ${_EXTRAS_DEFAULT}
+)
 
-ADD_SUBDIRECTORY(source)
+include (CMakeDependentOption)
+cmake_dependent_option (
+  GCH_USE_LIBCXX_WITH_CLANG
+  "Set to ON to use libc++ when compiling with Clang."
+  OFF
+  "CMAKE_CXX_COMPILER_ID MATCHES Clang"
+  OFF
+)
+
+add_subdirectory (source)
+
+export (
+  EXPORT
+    nonnull_ptr-targets
+  NAMESPACE
+    gch::
+)
