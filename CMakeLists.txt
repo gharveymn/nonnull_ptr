@@ -26,6 +26,10 @@ cmake_dependent_option (
   OFF
 )
 
+if (GCH_NONNULL_PTR_BUILD_TESTS)
+  enable_testing ()
+endif ()
+
 add_subdirectory (source)
 
 export (
