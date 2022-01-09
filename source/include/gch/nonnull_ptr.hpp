@@ -516,9 +516,9 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator>= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
-    noexcept (noexcept (! (lhs < rhs)))
+    noexcept (noexcept (! gch::operator< (lhs, rhs)))
   {
-    return ! (lhs < rhs);
+    return ! gch::operator< (lhs, rhs);
   }
 
   /**
@@ -534,9 +534,9 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator> (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
-    noexcept (noexcept (lhs < rhs))
+    noexcept (noexcept (gch::operator< (rhs, lhs)))
   {
-    return rhs < lhs;
+    return gch::operator< (rhs, lhs);
   }
 
   /**
@@ -552,9 +552,9 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator<= (const nonnull_ptr<T>& lhs, const nonnull_ptr<U>& rhs)
-    noexcept (noexcept (! (rhs < lhs)))
+    noexcept (noexcept (gch::operator>= (rhs, lhs)))
   {
-    return rhs >= lhs;
+    return gch::operator>= (rhs, lhs);
   }
 
 #ifdef GCH_LIB_THREE_WAY_COMPARISON
@@ -896,10 +896,10 @@ namespace gch
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator>= (const nonnull_ptr<T>& lhs, U* rhs)
-    noexcept (noexcept (! (lhs < rhs)))
+  operator>= (const nonnull_ptr<T>& lhs, U *rhs)
+    noexcept (noexcept (! (gch::operator< (lhs, rhs))))
   {
-    return ! (lhs < rhs);
+    return ! gch::operator< (lhs, rhs);
   }
 
   /**
@@ -914,10 +914,10 @@ namespace gch
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator>= (U* lhs, const nonnull_ptr<T>& rhs)
-    noexcept (noexcept (! (lhs < rhs)))
+  operator>= (U *lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (! gch::operator< (lhs, rhs)))
   {
-    return ! (lhs < rhs);
+    return ! gch::operator< (lhs, rhs);
   }
 
   /**
@@ -932,10 +932,10 @@ namespace gch
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator> (const nonnull_ptr<T>& lhs, U* rhs)
-    noexcept (noexcept (rhs < lhs))
+  operator> (const nonnull_ptr<T>& lhs, U *rhs)
+    noexcept (noexcept (gch::operator< (rhs, lhs)))
   {
-    return rhs < lhs;
+    return gch::operator< (rhs, lhs);
   }
 
   /**
@@ -950,10 +950,10 @@ namespace gch
   template <typename T, typename U>
   GCH_NODISCARD constexpr
   bool
-  operator> (U* lhs, const nonnull_ptr<T>& rhs)
-    noexcept (noexcept (rhs < lhs))
+  operator> (U *lhs, const nonnull_ptr<T>& rhs)
+    noexcept (noexcept (gch::operator< (rhs, lhs)))
   {
-    return rhs < lhs;
+    return gch::operator< (rhs, lhs);
   }
 
   /**
@@ -969,9 +969,9 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator<= (const nonnull_ptr<T>& lhs, U *rhs)
-    noexcept (noexcept (rhs >= lhs))
+    noexcept (noexcept (gch::operator>= (rhs, lhs)))
   {
-    return rhs >= lhs;
+    return gch::operator>= (rhs, lhs);
   }
 
   /**
@@ -987,9 +987,9 @@ namespace gch
   GCH_NODISCARD constexpr
   bool
   operator<= (U *lhs, const nonnull_ptr<T>& rhs)
-    noexcept (noexcept (rhs >= lhs))
+    noexcept (noexcept (gch::operator>= (rhs, lhs)))
   {
-    return rhs >= lhs;
+    return gch::operator>= (rhs, lhs);
   }
 
 #ifdef GCH_LIB_THREE_WAY_COMPARISON
