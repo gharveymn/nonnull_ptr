@@ -93,7 +93,7 @@
 #  ifndef GCH_CONCEPTS
 #    define GCH_CONCEPTS
 #  endif
-#  if defined(__has_include) && __has_include(<concepts>)
+#  if defined (__has_include) && __has_include (<concepts>)
 #    include <concepts>
 #    if defined (__cpp_lib_concepts) && __cpp_lib_concepts >= 202002L
 #      if ! defined (GCH_LIB_CONCEPTS) && ! defined (GCH_DISABLE_CONCEPTS)
@@ -107,7 +107,7 @@
 #  ifndef GCH_IMPL_THREE_WAY_COMPARISON
 #    define GCH_IMPL_THREE_WAY_COMPARISON
 #  endif
-#  if __has_include(<compare>)
+#  if defined (__has_include) && __has_include(<compare>)
 #    include <compare>
 #    if defined (__cpp_lib_three_way_comparison) && __cpp_lib_three_way_comparison >= 201907L
 #      ifndef GCH_LIB_THREE_WAY_COMPARISON
