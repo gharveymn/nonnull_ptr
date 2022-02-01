@@ -1,7 +1,7 @@
 /** nonnull_ptr.hpp
  * Defines an pointer wrapper which is not nullable.
  *
- * Copyright © 2020-2021 Gene Harvey
+ * Copyright © 2020 Gene Harvey
  *
  * This software may be modified and distributed under the terms
  * of the MIT license. See the LICENSE file for details.
@@ -15,6 +15,9 @@
 #include <utility>
 
 #ifdef __clang__
+#  ifndef GCH_CLANG
+#    define GCH_CLANG
+#  endif
 #  if defined (__cplusplus) && __cplusplus >= 201703L
 #    ifndef GCH_CLANG_17
 #      define GCH_CLANG_17
@@ -115,6 +118,11 @@
 #      endif
 #    endif
 #  endif
+#endif
+
+#ifdef GCH_CLANG
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wdocumentation" // Ignore @tparam warnings.
 #endif
 
 namespace gch
@@ -1074,7 +1082,7 @@ namespace gch
   template <typename T>
   using nonnull_cptr = nonnull_ptr<const T>;
 
-}
+} // namespace gch
 
 namespace std
 {
@@ -1102,6 +1110,10 @@ namespace std
     }
   };
 
-}
+} // namespace std
 
+#ifdef GCH_CLANG
+#  pragma clang diagnostic pop
 #endif
+
+#endif // GCH_NONNULL_PTR_HPP
