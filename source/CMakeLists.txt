@@ -69,6 +69,6 @@ if (GCH_NONNULL_PTR_BUILD_DOCS)
   add_subdirectory (docs)
 endif ()
 
-if (GCH_NONNULL_PTR_BUILD_TESTS)
+if (GCH_NONNULL_PTR_ENABLE_TESTS)
   add_subdirectory (test)
 endif ()
