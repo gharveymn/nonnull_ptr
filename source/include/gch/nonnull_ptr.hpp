@@ -238,7 +238,7 @@ namespace gch
      * Note: TriviallyCopyable.
      *
      */
-    ~nonnull_ptr (void)                             = default;
+    ~nonnull_ptr (void) = default;
 
     /**
      * Constructor
