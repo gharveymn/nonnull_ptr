@@ -25,7 +25,7 @@ class GCHNonnullPtrPrinter(object):
     return self._iterator(self.ptr)
 
   def to_string(self):
-    return self.val.type
+    return f'{self.val.type}'
 
   def display_hint(self):
     return None
